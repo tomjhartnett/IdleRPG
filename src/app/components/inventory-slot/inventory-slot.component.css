@@ -1,1 +1,5 @@
-
+.item-picture {
+  height: 60px;
+  width: 60px;
+  border: 5px solid;
+}

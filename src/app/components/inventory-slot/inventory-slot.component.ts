@@ -10,12 +10,12 @@ export class InventorySlotComponent implements OnInit {
 
   @Input() item: Item | undefined;
 
-  get slot() {
-    return this.item ? this.item.slot : 'Empty';
+  get imageSource() {
+    return this.item ? this.item.imagePath : 'empty.jpg';
   }
 
-  get name() {
-    return this.item ? this.item.name : '';
+  get borderColor() {
+    return this.item ? this.item.color : '#fff';
   }
 
   constructor() { }
