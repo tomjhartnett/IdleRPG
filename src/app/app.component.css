@@ -1,0 +1,11 @@
+.columns {
+  display: flex;
+}
+
+.half {
+  width: 50%;
+}
+
+.rest {
+  flex-grow: 1;
+}

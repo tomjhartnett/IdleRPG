@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {InventoryManagementService} from "../../services/inventory-management.service";
+import {PlayerManagementService} from "../../services/player-management.service";
 import {BehaviorSubject} from "rxjs";
 import {Item} from "../../models/item.model";
 
@@ -19,7 +19,7 @@ export class InventoryComponent implements OnInit {
   }
 
   get slots() {
-    return this.inventoryManagementService.playerSet.slots;
+    return this.playerManagementService.playerSet.slots;
   }
 
   get helmet(): Item | undefined {
@@ -68,10 +68,10 @@ export class InventoryComponent implements OnInit {
   }
 
   constructor(
-    private inventoryManagementService: InventoryManagementService,
+    private playerManagementService: PlayerManagementService,
     private _changeDetectorRef: ChangeDetectorRef
   ) {
-    this.inventoryObservable = this.inventoryManagementService.playerSet.updateObservable;
+    this.inventoryObservable = this.playerManagementService.playerSet.updateObservable;
     this.inventoryObservable.subscribe(() => this._changeDetectorRef.markForCheck());
   }
 

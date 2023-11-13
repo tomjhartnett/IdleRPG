@@ -2,7 +2,7 @@ export abstract class Item {
   name: string;
   slot: string;
   level: number;
-  rarity: string;
+  rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary";
   imagePath: string;
   stats: {stat: string, amount: number}[];
 
@@ -21,7 +21,7 @@ export abstract class Item {
     }
   }
 
-  protected constructor(name: string, slot: string, imagePath:string, level: number, stats: {stat: string, amount: number}[], rarity: string = "Common") {
+  protected constructor(name: string, slot: string, imagePath: string, level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
     this.name = name;
     this.slot = slot;
     this.imagePath = imagePath;
@@ -43,7 +43,7 @@ export class Armor extends Item {
     return [[this.slot, this.type], [`${this.armor} Armor`]];
   }
 
-  constructor(name: string, slot: string, imagePath:string, armor: number, armorType: "Cloth" | "Leather" | "Plate", level: number, stats: {stat: string, amount: number}[], rarity: string = "Common") {
+  constructor(name: string, slot: string, imagePath: string, armor: number, armorType: "Cloth" | "Leather" | "Plate", level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
     super(name, slot, imagePath, level, stats, rarity);
     this.armor = armor;
     this.armorType = armorType;
@@ -61,7 +61,7 @@ export class Shield extends Item {
     return [[this.slot, this.type], [`${this.armor} Armor`]];
   }
 
-  constructor(name: string, slot: string, imagePath:string, armor: number, armorType: "Cloth" | "Leather" | "Plate", level: number, stats: {stat: string, amount: number}[], rarity: string = "Common") {
+  constructor(name: string, slot: string, imagePath: string, armor: number, level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
     super(name, slot, imagePath, level, stats, rarity);
     this.armor = armor;
   }
@@ -82,10 +82,10 @@ export class Weapon extends Item {
   }
 
   get tooltipLines(): string[][] {
-    return [[this.slot, this.type], [`${this.minDamage} - ${this.maxDamage} Damage`, `Speed ${this.attackSpeed}`], [`(${this.DPS} damage per second)`]];
+    return [[this.slot, this.type], [`${this.minDamage} - ${this.maxDamage} Damage`, `Speed ${this.attackSpeed.toFixed(2)}`], [`(${this.DPS} damage per second)`]];
   }
 
-  constructor(name: string, slot: string, imagePath:string, minDamage: number, maxDamage: number, attackSpeed: number, weaponType: string, level: number, stats: {stat: string, amount: number}[], rarity: string = "Common") {
+  constructor(name: string, slot: string, imagePath: string, minDamage: number, maxDamage: number, attackSpeed: number, weaponType: string, level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
     super(name, slot, imagePath, level, stats, rarity);
     this.minDamage = minDamage;
     this.maxDamage = maxDamage;
