@@ -165,6 +165,6 @@ export class ItemGeneratorService {
 
   maxImages = 10;
   getRandomImage(identifier: string) {
-    return `${identifier}_${this._getRandomInt(this.maxImages)}.jpg`;
+    return `${identifier}_${this._getRandomInt(this.maxImages)+1}.jpg`;
   }
 }

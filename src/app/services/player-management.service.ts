@@ -36,7 +36,5 @@ export class PlayerManagementService {
 }
 
 
-// TODO make a new service for handling stats that asks this service for stat totals, have a new component to display stats next to inventory
-// TODO have automatic item generation based on level and optional slot/rarity/type with RNG stat generation
 // TODO have battle system with random monster generator, where reward is randomly generated too, based on monster level/difficulty
 // TODO have take/leave system for rewards and auto battling in between
