@@ -1,1 +1,8 @@
-<p>inventory-slot works!</p>
+<div>
+  <div *ngIf="name != ''">
+    Name: {{name}}
+  </div>
+  <div *ngIf="name == ''">
+    Empty Slot
+  </div>
+</div>

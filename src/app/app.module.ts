@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { InventoryComponent } from './inventory/inventory.component';
-import { TooltipComponent } from './tooltip/tooltip.component';
-import { InventorySlotComponent } from './inventory-slot/inventory-slot.component';
+import { InventoryComponent } from './components/inventory/inventory.component';
+import { TooltipComponent } from './components/tooltip/tooltip.component';
+import { InventorySlotComponent } from './components/inventory-slot/inventory-slot.component';
 
 @NgModule({
   declarations: [

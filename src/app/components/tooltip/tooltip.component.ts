@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {Item} from "../../models/item.model";
 
 @Component({
   selector: 'app-tooltip',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./tooltip.component.css']
 })
 export class TooltipComponent implements OnInit {
+
+  @Input() item!: Item;
 
   constructor() { }
 

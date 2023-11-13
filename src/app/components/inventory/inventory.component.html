@@ -1,1 +1,13 @@
-<p>inventory works!</p>
+<div class="main">
+  <div class="columns">
+    <!--  helmet-->
+    <app-inventory-slot [item]="helmet" (mouseenter)="setHoverItem(helmet)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+    <!--  chest-->
+    <app-inventory-slot [item]="chest" (mouseover)="setHoverItem(chest)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+    <!--  legs-->
+    <!--  boots-->
+    <!--  mainhand-->
+    <app-inventory-slot [item]="mainhand" (mouseover)="setHoverItem(mainhand)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+  </div>
+  <app-tooltip class="columns" *ngIf="showTooltip" [item]="hoverItem"></app-tooltip>
+</div>

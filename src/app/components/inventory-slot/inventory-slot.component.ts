@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {Item} from "../../models/item.model";
 
 @Component({
   selector: 'app-inventory-slot',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class InventorySlotComponent implements OnInit {
 
+  @Input() item: Item | undefined;
+
+  get slot() {
+    return this.item ? this.item.slot : 'Empty';
+  }
+
+  get name() {
+    return this.item ? this.item.name : '';
+  }
+
   constructor() { }
 
   ngOnInit(): void {
   }
-
 }
