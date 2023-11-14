@@ -21,7 +21,7 @@ export class PlayerManagementService {
   get attacks(): { minDmg: number, maxDmg: number, attSpd: number }[] {
     return this.playerSet.attacks.map(att => {
       return {
-        minDmg: att.minDmg + this.player.flatDmgUp, maxDmg: att.maxDmg + this.player.flatDmgUp, attSpd: att.attSpd
+        minDmg: Math.floor(att.minDmg * (1 + (this.player.percentDmgUp/100))), maxDmg: Math.ceil(att.maxDmg * (1 + (this.player.percentDmgUp/100))), attSpd: att.attSpd
       }
     });
   }
@@ -30,7 +30,7 @@ export class PlayerManagementService {
     private itemGeneratorService: ItemGeneratorService
   ) {
     let items: Item[] = [];
-    items.push(itemGeneratorService.generateItem(1, "Common", "Main Hand"));
+    items.push(itemGeneratorService.generateItem(3, "Rare", "Main Hand"));
     this.player = new Player(new InventorySet(items));
   }
 }

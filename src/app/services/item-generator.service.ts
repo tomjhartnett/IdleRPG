@@ -75,7 +75,7 @@ export class ItemGeneratorService {
   getWeaponStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): {minDamage: number, maxDamage: number, attackSpeed: number, stats: {stat: string, amount: number}[]} {
     return {
       minDamage: Math.round(level * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100))),
-      maxDamage: Math.round(level * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100) + this.getRaritySkewPercent(rarity))),
+      maxDamage: Math.round(level * 1.5 * (1 + (2 * this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100))),
       attackSpeed: 1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100),
       stats: this.getRandomStats(level, rarity)
     };
@@ -119,7 +119,7 @@ export class ItemGeneratorService {
     let ret: {stat: string, amount: number}[] = [];
     for (let stat of statNames) {
       if (pickedStats.includes(stat)) {
-        ret.push({stat, amount: Math.round(100 * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100)))});
+        ret.push({stat, amount: Math.round(level * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100)))});
       }
     }
 

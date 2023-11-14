@@ -9,6 +9,10 @@ import {Item, Weapon} from "../models/item.model";
 })
 export class CombatManagerService {
 
+
+  //TODO add in crit/DR/dodge/etc
+  // fix faulty items (100+ stats on lvl 1 items)
+
   _currentMonster: Monster = new Monster(1, "Common");
   _currentMonsterWeapon: Weapon = this.itemGeneratorService.generateItem(1, "Common", "Main Hand") as Weapon;
   recentAttacks: { damage: number, source: 'player' | 'monster' }[] = [];
@@ -24,7 +28,7 @@ export class CombatManagerService {
   }
 
   get monsterAttacks(): {minDmg: number, maxDmg: number, attSpd: number}[] {
-    return [{minDmg: this._currentMonsterWeapon.minDamage + this._currentMonster.flatDmgUp, maxDmg: this._currentMonsterWeapon.maxDamage + this._currentMonster.flatDmgUp, attSpd: this._currentMonsterWeapon.attackSpeed}]
+    return [{minDmg: Math.floor(this._currentMonsterWeapon.minDamage * (1 + (this._currentMonster.percentDmgUp/100))), maxDmg: Math.ceil(this._currentMonsterWeapon.maxDamage * (1 + (this._currentMonster.percentDmgUp/100))), attSpd: this._currentMonsterWeapon.attackSpeed}]
   }
 
   constructor(
@@ -53,10 +57,10 @@ export class CombatManagerService {
       entity.takeDamage(dmg);
       setTimeout(() => { this.doAttack(attack, entity) }, attack.attSpd * 1000);
       this.recentAttacks.push({damage: dmg, source: entity instanceof Player ? 'player' : 'monster'});
-      console.log('dealing', dmg, 'damage to', entity.name);
     } else {
       if(!this.combatEnded) {
         this.playerManagementService.player.addExp(this._currentMonster.xpAwarded);
+        this.playerManagementService.player.heal();
         this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level);
         this.combatEnded = true;
       }

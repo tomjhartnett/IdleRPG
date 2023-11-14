@@ -17,7 +17,7 @@ export abstract class Entity {
     return Math.round((this.level * 20) + (this.stamina * 10));
   }
 
-  get flatDmgUp(): number {
+  get percentDmgUp(): number {
     return this.strength * 2;
   }
 
@@ -44,6 +44,10 @@ export abstract class Entity {
     } else {
       this.currentHp -= dmg;
     }
+  }
+
+  heal() {
+    this.currentHp = this.maxHp;
   }
 }
 
@@ -76,7 +80,7 @@ export class Player extends Entity {
     return this.level * 5 + this.inventorySet?.spirit;
   }
   get avgDR(): string {
-    return (100 * (this.totalArmor / (this.totalArmor + 400 + (85 * this.level)))).toFixed(2);
+    return (100 * (this.totalArmor / (this.totalArmor + 400 + (7 * this.level)))).toFixed(2);
   }
 
   constructor(inventorySet: InventorySet, level: number = 1) {
