@@ -77,8 +77,8 @@ export class ItemGeneratorService {
 
   getWeaponStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): {minDamage: number, maxDamage: number, attackSpeed: number, stats: {stat: string, amount: number}[]} {
     return {
-      minDamage: Math.round(level * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100))),
-      maxDamage: Math.round(level * 1.5 * (1 + (2 * this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100))),
+      minDamage: Math.round(level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
+      maxDamage: Math.round(level * 1.5 * (1 + (2 * (this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
       attackSpeed: 1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100),
       stats: this.getRandomStats(level, rarity)
     };
@@ -86,14 +86,14 @@ export class ItemGeneratorService {
 
   getShieldStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): {armor: number, stats: {stat: string, amount: number}[]} {
     return {
-      armor: Math.round(level * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100))),
+      armor: Math.round(level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
       stats: this.getRandomStats(level, rarity)
     };
   }
 
   getArmorStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): {armor: number, armorType: "Cloth" | "Leather" | "Plate", stats: {stat: string, amount: number}[]} {
     return {
-      armor: Math.round(level * 2 * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100))),
+      armor: Math.round(level * 2 * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
       armorType: this.getRandomArmorType(),
       stats: this.getRandomStats(level, rarity)
     };

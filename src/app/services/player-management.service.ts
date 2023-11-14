@@ -32,14 +32,14 @@ export class PlayerManagementService {
 
   get canUpgradeWeapon(): boolean {
     const weapon = this.player.inventorySet.slots.get('Main Hand');
-    return !!weapon && weapon.rarity != 'Legendary' && weapon.level <= this.player.level;
+    return !!weapon && weapon.rarity != 'Legendary' && weapon.level <= this.player.level * 2;
   }
 
   constructor(
     private itemGeneratorService: ItemGeneratorService
   ) {
     let items: Item[] = [];
-    items.push(itemGeneratorService.generateItem(3, "Legendary", "Main Hand"));
+    items.push(itemGeneratorService.generateItem(3, "Epic", "Main Hand"));
     this.player = new Player(new InventorySet(items));
   }
 
