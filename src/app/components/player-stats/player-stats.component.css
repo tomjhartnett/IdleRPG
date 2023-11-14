@@ -17,3 +17,12 @@
   border: 1px solid #666;
   border-radius: 5px;
 }
+
+.red {
+  background-color: #ff5555;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}

@@ -15,10 +15,13 @@
     <div class="attacks">
       <div class="stat-row">Attacks:</div>
       <div *ngFor="let attack of attacks">
-        <div class="stat-row">Dmg: {{attack.minDmg}}-{{attack.maxDmg}} at {{attack.attSpd.toFixed(2)}} speed</div>
+        <div class="stat-row">Dmg: {{attack.minDmg}}-{{attack.maxDmg}} at {{attack.attSpd.toFixed(2)}} Speed</div>
+        <div class="stat-row">({{((attack.minDmg + attack.maxDmg)/attack.attSpd).toFixed(2)}} DPS)</div>
       </div>
     </div>
   </div>
-  <button *ngIf="canUpgradeWeapon" (click)="upgradeWeapon()">Upgrade Weapon?</button>
-  <button *ngIf="canUndoEquip" (click)="undoEquip()">Undo Last Equip?</button>
+  <div class="rows">
+    <button class="red" *ngIf="canUpgradeWeapon" (click)="upgradeWeapon()">Upgrade Weapon?</button>
+    <button *ngIf="canUndoEquip" (click)="undoEquip()">Undo Last Equip?</button>
+  </div>
 </div>
