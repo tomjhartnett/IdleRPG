@@ -2,8 +2,8 @@
   display: flex;
 }
 
-.half {
-  width: 50%;
+.thirds {
+  width: 33%;
 }
 
 .rest {
