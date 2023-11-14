@@ -75,6 +75,14 @@ export class ItemGeneratorService {
     return item!;
   }
 
+  upgradeWeapon(weapon: Weapon, newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary"): Weapon {
+    weapon.minDamage = Math.round(weapon.level * (1 + (this.getRaritySkewPercent(newRarity) / 100)));
+    weapon.maxDamage = Math.round(weapon.level * 1.5 * (1 + (2 * (this.getRaritySkewPercent(newRarity) / 100))));
+    weapon.stats = this.getRandomStats(weapon.level, newRarity);
+    weapon.rarity = newRarity;
+    return weapon;
+  }
+
   getWeaponStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): {minDamage: number, maxDamage: number, attackSpeed: number, stats: {stat: string, amount: number}[]} {
     return {
       minDamage: Math.round(level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
@@ -143,7 +151,8 @@ export class ItemGeneratorService {
       case "Common": return  10;
       case "Uncommon": return 20;
       case "Rare": return 40;
-      case "Legendary": return 80;
+      case "Epic": return 80;
+      case "Legendary": return 160;
       default: return 10;
     }
   }

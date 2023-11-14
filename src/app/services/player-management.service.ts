@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Item} from "../models/item.model";
+import {Item, Weapon} from "../models/item.model";
 import {Player} from "../models/entity.model";
 import {InventorySet} from "../models/inventory-set.model";
 import {ItemGeneratorService} from "./item-generator.service";
@@ -55,7 +55,7 @@ export class PlayerManagementService {
       } else if(oldRarity == "Uncommon") {
         newRarity = "Rare";
       }
-      this.player = new Player(new InventorySet([this.itemGeneratorService.generateItem(oldWeapon.level, newRarity, "Main Hand")]));
+      this.player = new Player(new InventorySet([this.itemGeneratorService.upgradeWeapon(oldWeapon as Weapon, newRarity)]));
     }
   }
 
