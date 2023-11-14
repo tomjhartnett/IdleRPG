@@ -13,6 +13,8 @@ export abstract class Entity {
   // name: string;
   // image: string;
 
+  abstract get totalArmor(): number;
+
   get maxHp(): number {
     return Math.round((this.level * 10) + (this.stamina * 5));
   }
@@ -33,17 +35,30 @@ export abstract class Entity {
     return Math.log(this.agility * 5);
   }
 
+  get avgDR(): string {
+    return (100 * this.DR).toFixed(2);
+  }
+
+  get DR(): number {
+    return (this.totalArmor / (this.totalArmor + 400 + (7 * this.level)));
+  }
+
   protected constructor(level: number) {
     this.level = level;
     this.currentHp = this.maxHp;
   }
 
-  takeDamage(dmg: number) {
-    if(this.currentHp - dmg < 0) {
+  takeDamage(dmg: number): number {
+    let modifiedDmg = Math.round(dmg * (1.0 - this.DR));
+    if(Math.floor(Math.random() * 100) + 1 <= Math.floor(this.dodgeChance)) {
+      modifiedDmg = 0;
+    }
+    if(this.currentHp - modifiedDmg < 0) {
       this.currentHp = 0;
     } else {
-      this.currentHp -= dmg;
+      this.currentHp -= modifiedDmg;
     }
+    return modifiedDmg;
   }
 
   heal() {
@@ -78,9 +93,6 @@ export class Player extends Entity {
   }
   get spirit(): number {
     return this.level * 5 + this.inventorySet?.spirit;
-  }
-  get avgDR(): string {
-    return (100 * (this.totalArmor / (this.totalArmor + 400 + (7 * this.level)))).toFixed(2);
   }
 
   constructor(inventorySet: InventorySet, level: number = 1) {

@@ -71,7 +71,7 @@ export class CombatPageComponent implements OnInit {
     this.combatManagerService.generateMonster();
   }
 
-  discard() {
+  retry() {
     this.combatManagerService.generateMonster();
   }
 }
