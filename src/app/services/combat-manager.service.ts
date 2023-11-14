@@ -9,10 +9,6 @@ import {Item, Weapon} from "../models/item.model";
 })
 export class CombatManagerService {
 
-
-  //TODO add in crit/DR/dodge/etc
-  // fix faulty items (100+ stats on lvl 1 items)
-
   _currentMonster: Monster = new Monster(1, "Common");
   _currentMonsterWeapon: Weapon = this.itemGeneratorService.generateItem(1, "Common", "Main Hand") as Weapon;
   recentAttacks: { damage: number, source: 'player' | 'monster' }[] = [];
@@ -42,21 +38,21 @@ export class CombatManagerService {
   combatStart() {
     this.combatEnded = false;
     for(let attack of this.playerAttacks) {
-      this.doAttack(attack, this._currentMonster);
+      this.doAttack(attack, this.playerManagementService.player.critChance, this._currentMonster);
     }
     for(let attack of this.monsterAttacks) {
-      this.doAttack(attack, this.playerManagementService.player);
+      this.doAttack(attack, this._currentMonster.critChance, this.playerManagementService.player);
     }
   }
 
   // after an attack, set a timeout to attack again, and cancel if the enemy is dead
-  doAttack(attack: {minDmg: number, maxDmg: number, attSpd: number}, entity: Entity) {
+  doAttack(attack: {minDmg: number, maxDmg: number, attSpd: number}, critChance: number, entity: Entity) {
     if (this._currentMonster.currentHp > 0 && this.playerManagementService.player.currentHp > 0) {
-      const dmg = this.calculateAttack(attack);
-      entity.takeDamage(dmg);
+      let dmg = this.calculateAttack(attack, critChance);
+      dmg = entity.takeDamage(dmg);
       if (this._currentMonster.currentHp > 0 && this.playerManagementService.player.currentHp > 0) {
         setTimeout(() => {
-          this.doAttack(attack, entity)
+          this.doAttack(attack, critChance, entity)
         }, attack.attSpd * 1000);
       } else {
         this.endCombat();
@@ -70,19 +66,25 @@ export class CombatManagerService {
   }
 
   endCombat() {
-    this.playerManagementService.player.addExp(this._currentMonster.xpAwarded);
-    this.playerManagementService.player.heal();
-    let slot;
-    if(this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level * 3 < this.playerManagementService.player.level) {
-      slot = 'Main Hand';
+    if(this.playerManagementService.player.currentHp > 0) {
+      this.playerManagementService.player.addExp(this._currentMonster.xpAwarded);
+      this.playerManagementService.player.heal();
+      let slot;
+      if (this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level * 3 < this.playerManagementService.player.level) {
+        slot = 'Main Hand';
+      }
+      const avoidWeapon = this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level >= this.playerManagementService.player.level;
+      this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level, "Random", slot, avoidWeapon);
     }
-    const avoidWeapon = this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level >= this.playerManagementService.player.level;
-    this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level, "Random", slot, avoidWeapon);
     this.combatEnded = true;
   }
 
-  calculateAttack(attack: {minDmg: number, maxDmg: number, attSpd: number}): number {
-    return Math.floor(Math.random() * (attack.maxDmg - attack.minDmg)) + attack.minDmg + 1;
+  calculateAttack(attack: {minDmg: number, maxDmg: number, attSpd: number}, critChance: number): number {
+    let critDmgBonus = 1;
+    if(Math.floor(Math.random() * 100) + 1 > critChance) {
+      critDmgBonus = 2;
+    }
+    return ((Math.floor(Math.random() * (attack.maxDmg - attack.minDmg)) + attack.minDmg + 1) * critDmgBonus);
   }
 
   generateMonster(level: number = this.playerManagementService.player.level, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss") {
