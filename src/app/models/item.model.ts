@@ -5,6 +5,7 @@ export abstract class Item {
   rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary";
   imagePath: string;
   stats: {stat: string, amount: number}[];
+  lastUpdatedWeight: number = 0;
 
   get strength() {
     let total = 0;

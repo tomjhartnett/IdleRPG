@@ -1,0 +1,23 @@
+<div class="container">
+  <div class="title">{{ title }}</div>
+
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" [(ngModel)]="autoFilterItems" (change)="changeWeights()">
+      Automatically filter items?
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" [(ngModel)]="autoEquipItems" (change)="autoEquip()">
+      Automatically equip upgrades? (except Main Hand)
+    </label>
+  </div>
+
+  <div *ngIf="autoFilterItems">
+    <div *ngFor="let weight of weights" class="row">
+      <span>Weight for {{ weight.stat }}: </span>
+      <input type="number" [(ngModel)]="weight.weight" [disabled]="!autoFilterItems" (input)="changeWeights()" min="0" max="999">
+    </div>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import {PlayerManagementService} from "./player-management.service";
 import {ItemGeneratorService} from "./item-generator.service";
 import {Entity, Monster, Player} from "../models/entity.model";
 import {Item, Weapon} from "../models/item.model";
+import {ItemFilterService} from "./item-filter.service";
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,8 @@ export class CombatManagerService {
   _currentMonsterWeapon: Weapon = this.itemGeneratorService.generateItem(1, "Common", "Main Hand") as Weapon;
   recentAttacks: { damage: number, source: 'player' | 'monster' }[] = [];
   _rewardItem: Item | undefined;
+  autoEquipReward: Item | undefined;
+  currentTimeout: any;
   combatEnded = false;
 
   get combatActive(): boolean {
@@ -29,7 +32,8 @@ export class CombatManagerService {
 
   constructor(
     private itemGeneratorService: ItemGeneratorService,
-    private playerManagementService: PlayerManagementService
+    private playerManagementService: PlayerManagementService,
+    private itemFilterService: ItemFilterService
   ) {
     this.combatStart();
   }
@@ -75,6 +79,28 @@ export class CombatManagerService {
       }
       const avoidWeapon = this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level >= this.playerManagementService.player.level;
       this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level, "Random", slot, avoidWeapon);
+      if(this.itemFilterService.isFiltering) {
+        this.itemFilterService.scoreItem(this._rewardItem);
+        const oldItem = this.playerManagementService.player.inventorySet.slots.get(this._rewardItem.slot);
+        if(oldItem) {
+          this.itemFilterService.scoreItem(oldItem);
+          if (oldItem.lastUpdatedWeight > this._rewardItem.lastUpdatedWeight) {
+            this.generateMonster();
+          }
+        }
+        if (this.itemFilterService.isAutoEquiping && this._rewardItem.slot != "Main Hand" && (!oldItem || oldItem.lastUpdatedWeight <= this._rewardItem.lastUpdatedWeight)) {
+          this.autoEquipReward = this._rewardItem;
+          if(!this.currentTimeout) {
+            this.currentTimeout = setTimeout(() => {
+              if (this.combatEnded && this._rewardItem && this._rewardItem === this.autoEquipReward) {
+                this.playerManagementService.player.inventorySet.addItem(this._rewardItem);
+                this.currentTimeout = undefined;
+                this.generateMonster();
+              }
+            }, 1000);
+          }
+        }
+      }
     }
     this.combatEnded = true;
   }

@@ -10,7 +10,7 @@
 
     <div class="combat-section attack-section">
       <div class="attack-list">
-        <div *ngFor="let attack of recentAttacks.slice(-10).reverse(); let i = index" [class.fade-out]="i >= 8">
+        <div *ngFor="let attack of recentAttacks.slice(-5).reverse(); let i = index" [class.fade-out]="i >= 5">
           <span class="damage">{{ attack.damage }}</span>
           <span class="arrow">{{ attack.source === 'player' ? '←' : '→' }}</span>
         </div>
@@ -25,25 +25,30 @@
       <div class="health-text">{{ monsterCurrentHP }} / {{ monsterMaxHP }}</div>
     </div>
   </div>
-  <div *ngIf="playerCurrentHP <= 0">
-    <span>You lose! Click to try again.</span>
-    <button (click)="retry()">Try Again</button>
-  </div>
-  <div *ngIf="monsterCurrentHP <= 0">
-    <span>You win! Here's your prize.</span>
-    <div class="rewards" *ngIf="rewardItem && !combatActive">
-      <div>
-        <app-inventory-slot [item]="rewardItem"></app-inventory-slot>
+  <div class="rewards">
+    <div class="thirds">
+      <app-item-filter></app-item-filter>
+    </div>
+    <div class="thirds" *ngIf="playerCurrentHP <= 0">
+      <span>You lose! Click to try again.</span>
+      <button (click)="retry()">Try Again</button>
+    </div>
+    <div class="thirds" *ngIf="monsterCurrentHP <= 0">
+      <span>You win! Here's your prize.</span>
+      <div class="rewards" *ngIf="rewardItem && !combatActive">
         <div>
-          <button (click)="equip()">Equip</button>
-          <button (click)="retry()">Discard</button>
+          <app-inventory-slot [item]="rewardItem"></app-inventory-slot>
+          <div>
+            <button (click)="equip()">Equip</button>
+            <button (click)="retry()">Discard</button>
+          </div>
+          <app-tooltip [item]="rewardItem"></app-tooltip>
         </div>
-        <app-tooltip [item]="rewardItem"></app-tooltip>
-      </div>
-      <div *ngIf="rewardEquivalent">
-        Current Item in Slot:
-        <app-inventory-slot [item]="rewardEquivalent"></app-inventory-slot>
-        <app-tooltip [item]="rewardEquivalent"></app-tooltip>
+        <div *ngIf="rewardEquivalent">
+          Current Item in Slot:
+          <app-inventory-slot [item]="rewardEquivalent"></app-inventory-slot>
+          <app-tooltip [item]="rewardEquivalent"></app-tooltip>
+        </div>
       </div>
     </div>
   </div>
