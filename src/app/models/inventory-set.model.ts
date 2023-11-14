@@ -7,6 +7,42 @@ export class InventorySet {
 
   slots: Map<string, Item>;
 
+  get strength() {
+    let total = 0;
+    for(let item of this.slots.values()) {
+      total += item.strength;
+    }
+    return total;
+  }
+  get stamina() {
+    let total = 0;
+    for(let item of this.slots.values()) {
+      total += item.stamina;
+    }
+    return total;
+  }
+  get agility() {
+    let total = 0;
+    for(let item of this.slots.values()) {
+      total += item.agility;
+    }
+    return total;
+  }
+  get intellect() {
+    let total = 0;
+    for(let item of this.slots.values()) {
+      total += item.intellect;
+    }
+    return total;
+  }
+  get spirit() {
+    let total = 0;
+    for(let item of this.slots.values()) {
+      total += item.spirit;
+    }
+    return total;
+  }
+
   get totalArmor(): number {
     let total = 0;
     for(let item of this.slots.values()) {

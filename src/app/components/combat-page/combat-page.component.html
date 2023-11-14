@@ -1,0 +1,49 @@
+<div>
+  <div class="combat-container">
+    <div class="combat-section player-section">
+      <div class="name">{{ playerName }}</div>
+      <div class="health-bar">
+        <div class="red-bar" [style.width]="playerHealthPercentage + '%'"></div>
+      </div>
+      <div class="health-text">{{ playerCurrentHP }} / {{ playerMaxHP }}</div>
+    </div>
+
+    <div class="combat-section attack-section">
+      <div class="attack-list">
+        <div *ngFor="let attack of recentAttacks.slice(-10).reverse(); let i = index" [class.fade-out]="i >= 8">
+          <span class="damage">{{ attack.damage }}</span>
+          <span class="arrow">{{ attack.source === 'player' ? '←' : '→' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="combat-section monster-section">
+      <div class="name">{{ monsterName }}</div>
+      <div class="health-bar">
+        <div class="red-bar" [style.width]="monsterHealthPercentage + '%'"></div>
+      </div>
+      <div class="health-text">{{ monsterCurrentHP }} / {{ monsterMaxHP }}</div>
+    </div>
+  </div>
+  <div *ngIf="!combatActive && playerCurrentHP <= 0">
+    <span>You lose! Click to try again.</span>
+  </div>
+  <div *ngIf="!combatActive && monsterCurrentHP <= 0 && rewardItem">
+    <div class="rewards">
+      <div>
+        <span>You win! Here's your prize.</span>
+        <app-inventory-slot [item]="rewardItem"></app-inventory-slot>
+        <div>
+          <button (click)="equip()">Equip</button>
+          <button (click)="discard()">Discard</button>
+        </div>
+        <app-tooltip [item]="rewardItem"></app-tooltip>
+      </div>
+      <div *ngIf="rewardEquivalent">
+        Current Item in Slot:
+        <app-inventory-slot [item]="rewardEquivalent"></app-inventory-slot>
+        <app-tooltip [item]="rewardEquivalent"></app-tooltip>
+      </div>
+    </div>
+  </div>
+</div>

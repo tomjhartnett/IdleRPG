@@ -30,11 +30,7 @@ export class PlayerManagementService {
     private itemGeneratorService: ItemGeneratorService
   ) {
     let items: Item[] = [];
-    items.push(itemGeneratorService.generateItem(1, "Legendary", "Main Hand"));
+    items.push(itemGeneratorService.generateItem(1, "Common", "Main Hand"));
     this.player = new Player(new InventorySet(items));
   }
 }
-
-
-// TODO have battle system with random monster generator, where reward is randomly generated too, based on monster level/difficulty
-// TODO have take/leave system for rewards and auto battling in between

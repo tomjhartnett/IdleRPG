@@ -1,6 +1,8 @@
 import {InventorySet} from "./inventory-set.model";
+import {Item} from "./item.model";
 
 export abstract class Entity {
+  abstract name: string;
   level: number;
   abstract strength: number;
   abstract stamina: number;
@@ -35,14 +37,23 @@ export abstract class Entity {
     this.level = level;
     this.currentHp = this.maxHp;
   }
+
+  takeDamage(dmg: number) {
+    if(this.currentHp - dmg < 0) {
+      this.currentHp = 0;
+    } else {
+      this.currentHp -= dmg;
+    }
+  }
 }
 
 export class Player extends Entity {
+  name = "Player";
   xp: number = 0;
   inventorySet: InventorySet;
 
   get totalArmor(): number {
-    return this.baseArmor + this.inventorySet.totalArmor;
+    return this.baseArmor + this.inventorySet?.totalArmor;
   }
 
   get xpToNextLevel() {
@@ -50,19 +61,19 @@ export class Player extends Entity {
   }
 
   get strength(): number {
-    return this.level * 5;
+    return this.level * 5 + this.inventorySet?.strength;
   }
   get stamina(): number {
-    return this.level * 5;
+    return this.level * 5 + this.inventorySet?.stamina;
   }
   get agility(): number {
-    return this.level * 5;
+    return this.level * 5 + this.inventorySet?.agility;
   }
   get intellect(): number {
-    return this.level * 5;
+    return this.level * 5 + this.inventorySet?.intellect;
   }
   get spirit(): number {
-    return this.level * 5;
+    return this.level * 5 + this.inventorySet?.spirit;
   }
   get avgDR() {
     return (this.totalArmor / (this.totalArmor + 400 + (85 * this.level)));
@@ -71,6 +82,11 @@ export class Player extends Entity {
   constructor(inventorySet: InventorySet, level: number = 1) {
     super(level);
     this.inventorySet = inventorySet;
+    this.currentHp = this.maxHp;
+  }
+
+  equipItem(item: Item) {
+    this.inventorySet.addItem(item);
   }
 
   // add exp to character and level up if needed
@@ -85,7 +101,8 @@ export class Player extends Entity {
 }
 
 export class Monster extends Entity {
-  rarity: "Common" | "Uncommon" | "Rare" | "Legendary" | "Boss";
+  name = "Monster";
+  rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss";
   strength: number = this.getRandomInt(this.rarityPercent) * this.level * 5;
   stamina: number = this.getRandomInt(this.rarityPercent) * this.level * 5;
   agility: number = this.getRandomInt(this.rarityPercent) * this.level * 5;
@@ -96,20 +113,35 @@ export class Monster extends Entity {
     return this.baseArmor;
   }
 
+  get xpAwarded(): number {
+    let rarityScale;
+    switch (this.rarity) {
+      case "Boss": rarityScale = 32; break;
+      case "Legendary": rarityScale = 16; break;
+      case "Epic": rarityScale = 8; break;
+      case "Rare": rarityScale = 4; break;
+      case "Uncommon": rarityScale = 2; break;
+      default: rarityScale = 1; break;
+    }
+    return this.level * rarityScale * 2;
+  }
+
   get rarityPercent(): number {
     switch (this.rarity) {
-      case "Common": return  10;
-      case "Uncommon": return 20;
-      case "Rare": return 40;
-      case "Legendary": return 80;
-      case "Boss": return 160;
-      default: return 10;
+      case "Common": return  1;
+      case "Uncommon": return 2;
+      case "Rare": return 4;
+      case "Epic": return 8;
+      case "Legendary": return 16;
+      case "Boss": return 32;
+      default: return 1;
     }
   }
 
-  constructor(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Legendary" | "Boss") {
+  constructor(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss") {
     super(level);
     this.rarity = rarity;
+    this.currentHp = this.maxHp;
   }
 
   // generates a number from 0 to max

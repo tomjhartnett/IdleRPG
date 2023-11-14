@@ -6,6 +6,52 @@ export abstract class Item {
   imagePath: string;
   stats: {stat: string, amount: number}[];
 
+  get strength() {
+    let total = 0;
+    for(let stat of this.stats) {
+      if(stat.stat === 'Strength') {
+        total += stat.amount;
+      }
+    }
+    return total;
+  }
+  get stamina() {
+    let total = 0;
+    for(let stat of this.stats) {
+      if(stat.stat === 'Stamina') {
+        total += stat.amount;
+      }
+    }
+    return total;
+  }
+  get agility() {
+    let total = 0;
+    for(let stat of this.stats) {
+      if(stat.stat === 'Agility') {
+        total += stat.amount;
+      }
+    }
+    return total;
+  }
+  get intellect() {
+    let total = 0;
+    for(let stat of this.stats) {
+      if(stat.stat === 'Intellect') {
+        total += stat.amount;
+      }
+    }
+    return total;
+  }
+  get spirit() {
+    let total = 0;
+    for(let stat of this.stats) {
+      if(stat.stat === 'Spirit') {
+        total += stat.amount;
+      }
+    }
+    return total;
+  }
+
   abstract get type(): string;
 
   abstract get tooltipLines(): string[][];

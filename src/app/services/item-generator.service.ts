@@ -31,12 +31,12 @@ export class ItemGeneratorService {
     this._itemName.set("Mace", ["Mace", "Hammer"]);
   }
 
-  generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary", slot?: string): Item {
+  generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Random", slot?: string): Item {
     let item: Item;
     if (!slot) {
       slot = this.slots[this._getRandomInt(this.slots.length)];
     }
-    if (!rarity) {
+    if (!rarity || rarity == "Random") {
       const rng = this._getRandomInt(100);
       if(rng > 98) {
         rarity = "Legendary"

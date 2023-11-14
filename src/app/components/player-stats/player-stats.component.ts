@@ -44,6 +44,15 @@ export class PlayerStatsComponent implements OnInit {
   get attacks(): { minDmg: number, maxDmg: number, attSpd: number }[] {
     return this.playerManagementService.attacks;
   }
+  get level(): number {
+    return this.playerManagementService.player.level;
+  }
+  get currentXP(): number {
+    return this.playerManagementService.player.xp;
+  }
+  get xpToNextLevel(): number {
+    return this.playerManagementService.player.xpToNextLevel;
+  }
 
   constructor(
     private playerManagementService: PlayerManagementService

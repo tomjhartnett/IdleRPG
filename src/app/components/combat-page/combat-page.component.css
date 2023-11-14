@@ -1,0 +1,79 @@
+.combat-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+.combat-section {
+  width: 33.33%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.player-section, .monster-section {
+  background-color: #e6f7ff;
+}
+
+.attack-section {
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.name {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.health-bar {
+  background-color: #ddd;
+  height: 20px;
+  width: 100%;
+  position: relative;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.rewards {
+  display: flex;
+}
+
+.health-bar div {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #ff5555;
+  transition: width 0.3s ease;
+}
+
+.health-text {
+  color: #333;
+}
+
+.attack-list {
+  width: 80%;
+}
+
+.attack-list div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.attack-list div.fade-out {
+  opacity: 0.5;
+}
+
+.damage {
+  font-weight: bold;
+}
+
+.arrow {
+  font-size: 18px;
+}
