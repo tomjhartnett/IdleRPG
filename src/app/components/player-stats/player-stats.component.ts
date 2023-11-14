@@ -39,7 +39,7 @@ export class PlayerStatsComponent implements OnInit {
     return this.playerManagementService.player.dodgeChance.toFixed(2);
   }
   get avgDR(): string {
-    return this.playerManagementService.player.avgDR.toFixed(2);
+    return this.playerManagementService.player.avgDR;
   }
   get attacks(): { minDmg: number, maxDmg: number, attSpd: number }[] {
     return this.playerManagementService.attacks;

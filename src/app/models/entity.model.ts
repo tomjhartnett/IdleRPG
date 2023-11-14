@@ -14,7 +14,7 @@ export abstract class Entity {
   // image: string;
 
   get maxHp(): number {
-    return (this.level * 20) + (this.stamina * 10);
+    return Math.round((this.level * 20) + (this.stamina * 10));
   }
 
   get flatDmgUp(): number {
@@ -57,7 +57,7 @@ export class Player extends Entity {
   }
 
   get xpToNextLevel() {
-    return 8 * this.level;
+    return Math.round(8 * this.level);
   }
 
   get strength(): number {
@@ -75,8 +75,8 @@ export class Player extends Entity {
   get spirit(): number {
     return this.level * 5 + this.inventorySet?.spirit;
   }
-  get avgDR() {
-    return (this.totalArmor / (this.totalArmor + 400 + (85 * this.level)));
+  get avgDR(): string {
+    return (100 * (this.totalArmor / (this.totalArmor + 400 + (85 * this.level)))).toFixed(2);
   }
 
   constructor(inventorySet: InventorySet, level: number = 1) {
@@ -91,11 +91,12 @@ export class Player extends Entity {
 
   // add exp to character and level up if needed
   addExp(exp: number) {
-    if(this.xp + exp > this.xpToNextLevel) {
-      this.xp = this.xp + exp - this.xpToNextLevel;
+    while(this.xp + exp >= this.xpToNextLevel) {
+      this.xp = Math.round(this.xp + exp - this.xpToNextLevel);
       this.level++;
-    } else {
-      this.xp += exp;
+    }
+    if (this.xp + exp < this.xpToNextLevel) {
+      this.xp = Math.round(this.xp + exp);
     }
   }
 }

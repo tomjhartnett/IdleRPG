@@ -7,7 +7,7 @@ import {Armor, Item, Shield, Weapon} from "../models/item.model";
 export class ItemGeneratorService {
 
   slots = ["Head", "Neck", "Shoulders", "Back", "Chest", "Wrists", "Hands", "Waist", "Legs", "Feet", "Finger", "Trinket", "Main Hand", "Off Hand"];
-  mainHandTypes = ["Sword", "Mace"];
+  mainHandTypes = ["Sword", "Mace", "Dagger"];
   offHandTypes = ["Shield", "Offhand Dagger"];
   _itemName: Map<string, string[]> = new Map<string, string[]>();
 
@@ -29,6 +29,7 @@ export class ItemGeneratorService {
     this._itemName.set("Offhand Dagger", ["Dagger", "Needle"]);
     this._itemName.set("Sword", ["Sword", "Broadsword"]);
     this._itemName.set("Mace", ["Mace", "Hammer"]);
+    this._itemName.set("Dagger", ["Dagger", "Blade"]);
   }
 
   generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Random", slot?: string): Item {
@@ -58,7 +59,7 @@ export class ItemGeneratorService {
       const type = this.offHandTypes[this._getRandomInt(this.offHandTypes.length)];
       if (type == 'Offhand Dagger') {
         const weaponStats = this.getWeaponStats(level, rarity);
-        item = new Weapon(this.getRandomName(type), slot, this.getRandomImage(type), weaponStats.minDamage, weaponStats.maxDamage, weaponStats.attackSpeed, type, level, weaponStats.stats, rarity);
+        item = new Weapon(this.getRandomName(type), slot, this.getRandomImage('Dagger'), weaponStats.minDamage, weaponStats.maxDamage, weaponStats.attackSpeed, type, level, weaponStats.stats, rarity);
       } else if (type == 'Shield') {
         const armorStats = this.getShieldStats(level, rarity);
         item = new Shield(this.getRandomName(type), slot, this.getRandomImage(type), armorStats.armor, level, armorStats.stats, rarity);
@@ -163,7 +164,7 @@ export class ItemGeneratorService {
     return Math.floor(Math.random() * max);
   }
 
-  maxImages = 10;
+  maxImages = 2;
   getRandomImage(identifier: string) {
     return `${identifier}_${this._getRandomInt(this.maxImages)+1}.jpg`;
   }
