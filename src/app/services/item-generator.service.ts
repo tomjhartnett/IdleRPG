@@ -32,9 +32,12 @@ export class ItemGeneratorService {
     this._itemName.set("Dagger", ["Dagger", "Blade"]);
   }
 
-  generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Random", slot?: string): Item {
+  generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Random", slot?: string, avoidWeapon?: boolean): Item {
     let item: Item;
     if (!slot) {
+      slot = this.slots[this._getRandomInt(this.slots.length)];
+    }
+    while(avoidWeapon && slot == "Main Hand") {
       slot = this.slots[this._getRandomInt(this.slots.length)];
     }
     if (!rarity || rarity == "Random") {

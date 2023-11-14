@@ -41,7 +41,6 @@ export class CombatManagerService {
   // does all attacks from both players at combat start
   combatStart() {
     this.combatEnded = false;
-    console.log('starting combat with ', this._currentMonster.name);
     for(let attack of this.playerAttacks) {
       this.doAttack(attack, this._currentMonster);
     }
@@ -73,7 +72,12 @@ export class CombatManagerService {
   endCombat() {
     this.playerManagementService.player.addExp(this._currentMonster.xpAwarded);
     this.playerManagementService.player.heal();
-    this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level);
+    let slot;
+    if(this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level * 3 < this.playerManagementService.player.level) {
+      slot = 'Main Hand';
+    }
+    const avoidWeapon = this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level >= this.playerManagementService.player.level;
+    this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level, "Random", slot, avoidWeapon);
     this.combatEnded = true;
   }
 

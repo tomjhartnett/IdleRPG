@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {PlayerManagementService} from "../../services/player-management.service";
+import {CombatManagerService} from "../../services/combat-manager.service";
 
 @Component({
   selector: 'app-player-stats',
@@ -61,7 +62,8 @@ export class PlayerStatsComponent implements OnInit {
   }
 
   constructor(
-    private playerManagementService: PlayerManagementService
+    private playerManagementService: PlayerManagementService,
+    private combatManagerService: CombatManagerService
   ) { }
 
   ngOnInit(): void {
@@ -70,6 +72,7 @@ export class PlayerStatsComponent implements OnInit {
   upgradeWeapon() {
     if(confirm("Upgrading your weapon tier will destroy the rest of your equipment and reset your character to level 1. This can be useful if your fights are taking a long time because you can't get a good weapon drop. Are you sure you want to continue?")) {
       this.playerManagementService.upgradeWeapon();
+      this.combatManagerService.generateMonster();
     }
   }
 

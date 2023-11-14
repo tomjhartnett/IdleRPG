@@ -95,12 +95,10 @@ export class Player extends Entity {
 
   // add exp to character and level up if needed
   addExp(exp: number) {
-    while(this.xp + exp >= this.xpToNextLevel) {
-      this.xp = Math.round(this.xp + exp - this.xpToNextLevel);
+    this.xp = Math.round(this.xp + exp);
+    while(this.xp >= this.xpToNextLevel) {
+      this.xp = Math.round(this.xp - this.xpToNextLevel);
       this.level++;
-    }
-    if (this.xp + exp < this.xpToNextLevel) {
-      this.xp = Math.round(this.xp + exp);
     }
   }
 }
