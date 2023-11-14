@@ -25,13 +25,13 @@
       <div class="health-text">{{ monsterCurrentHP }} / {{ monsterMaxHP }}</div>
     </div>
   </div>
-  <div *ngIf="!combatActive && playerCurrentHP <= 0">
+  <div *ngIf="playerCurrentHP <= 0">
     <span>You lose! Click to try again.</span>
   </div>
-  <div *ngIf="!combatActive && monsterCurrentHP <= 0 && rewardItem">
-    <div class="rewards">
+  <div *ngIf="monsterCurrentHP <= 0">
+    <span>You win! Here's your prize.</span>
+    <div class="rewards" *ngIf="rewardItem && !combatActive">
       <div>
-        <span>You win! Here's your prize.</span>
         <app-inventory-slot [item]="rewardItem"></app-inventory-slot>
         <div>
           <button (click)="equip()">Equip</button>

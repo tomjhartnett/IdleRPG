@@ -55,16 +55,26 @@ export class CombatManagerService {
     if (this._currentMonster.currentHp > 0 && this.playerManagementService.player.currentHp > 0) {
       const dmg = this.calculateAttack(attack);
       entity.takeDamage(dmg);
-      setTimeout(() => { this.doAttack(attack, entity) }, attack.attSpd * 1000);
+      if (this._currentMonster.currentHp > 0 && this.playerManagementService.player.currentHp > 0) {
+        setTimeout(() => {
+          this.doAttack(attack, entity)
+        }, attack.attSpd * 1000);
+      } else {
+        this.endCombat();
+      }
       this.recentAttacks.push({damage: dmg, source: entity instanceof Player ? 'player' : 'monster'});
     } else {
       if(!this.combatEnded) {
-        this.playerManagementService.player.addExp(this._currentMonster.xpAwarded);
-        this.playerManagementService.player.heal();
-        this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level);
-        this.combatEnded = true;
+        this.endCombat();
       }
     }
+  }
+
+  endCombat() {
+    this.playerManagementService.player.addExp(this._currentMonster.xpAwarded);
+    this.playerManagementService.player.heal();
+    this._rewardItem = this.itemGeneratorService.generateItem(this.playerManagementService.player.level);
+    this.combatEnded = true;
   }
 
   calculateAttack(attack: {minDmg: number, maxDmg: number, attSpd: number}): number {

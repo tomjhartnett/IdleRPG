@@ -10,6 +10,10 @@ import {ItemGeneratorService} from "./item-generator.service";
 export class PlayerManagementService {
   player: Player;
 
+  get lastReplacedItem(): Item | undefined {
+    return this.playerSet.lastEquipedItem;
+  }
+
   get playerSet() {
     return this.player.inventorySet;
   }
@@ -26,11 +30,38 @@ export class PlayerManagementService {
     });
   }
 
+  get canUpgradeWeapon(): boolean {
+    const weapon = this.player.inventorySet.slots.get('Main Hand');
+    return !!weapon && weapon.rarity != 'Legendary' && weapon.level <= this.player.level;
+  }
+
   constructor(
     private itemGeneratorService: ItemGeneratorService
   ) {
     let items: Item[] = [];
-    items.push(itemGeneratorService.generateItem(3, "Rare", "Main Hand"));
+    items.push(itemGeneratorService.generateItem(3, "Legendary", "Main Hand"));
     this.player = new Player(new InventorySet(items));
+  }
+
+  upgradeWeapon() {
+    const oldWeapon = this.playerSet.slots.get('Main Hand');
+    if(oldWeapon) {
+      const oldRarity = oldWeapon.rarity;
+      let newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Uncommon";
+      if(oldRarity == "Epic") {
+        newRarity = "Legendary";
+      } else if(oldRarity == "Rare") {
+        newRarity = "Epic";
+      } else if(oldRarity == "Uncommon") {
+        newRarity = "Rare";
+      }
+      this.player = new Player(new InventorySet([this.itemGeneratorService.generateItem(oldWeapon.level, newRarity, "Main Hand")]));
+    }
+  }
+
+  undoEquip() {
+    if(this.playerSet.lastEquipedItem) {
+      this.playerSet.addItem(this.playerSet.lastEquipedItem);
+    }
   }
 }

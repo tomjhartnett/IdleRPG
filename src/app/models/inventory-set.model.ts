@@ -4,7 +4,7 @@ import {Armor, Item, Shield, Weapon} from "./item.model";
 export class InventorySet {
   // used to let pages know the inventory has updated
   updateObservable: BehaviorSubject<boolean>;
-
+  lastEquipedItem: Item | undefined;
   slots: Map<string, Item>;
 
   get strength() {
@@ -72,6 +72,7 @@ export class InventorySet {
   }
 
   addItem(item: Item) {
+    this.lastEquipedItem = this.slots.get(item.slot);
     this.slots.set(item.slot, item);
   }
 }

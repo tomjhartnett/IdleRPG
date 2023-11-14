@@ -1,20 +1,24 @@
-<div class="stat-container">
-  <div class="stat-row">HP: {{currentHp}}/{{maxHp}}</div>
-  <div class="stat-row">Level: {{level}}</div>
-  <div class="stat-row">Exp to Level: {{currentXP}}/{{xpToNextLevel}}</div>
-  <div class="stat-row">Strength: {{strength}}</div>
-  <div class="stat-row">Stamina: {{stamina}}</div>
-  <div class="stat-row">Agility: {{agility}}</div>
-  <div class="stat-row">Intellect: {{intellect}}</div>
-  <div class="stat-row">Spirit: {{spirit}}</div>
-  <div class="stat-row">Armor: {{armor}}</div>
-  <div class="stat-row">Crit Chance: {{critChance}}%</div>
-  <div class="stat-row">Dodge Chance: {{dodgeChance}}%</div>
-  <div class="stat-row">Avg Dmg Reduc: {{avgDR}}%</div>
-  <div class="attacks">
-    <div class="stat-row">Attacks:</div>
-    <div *ngFor="let attack of attacks">
-      <div class="stat-row">Dmg: {{attack.minDmg}}-{{attack.maxDmg}} at {{attack.attSpd.toFixed(2)}} speed</div>
+<div>
+  <div class="stat-container">
+    <div class="stat-row">HP: {{currentHp}}/{{maxHp}}</div>
+    <div class="stat-row">Level: {{level}}</div>
+    <div class="stat-row">Exp to Level: {{currentXP}}/{{xpToNextLevel}}</div>
+    <div class="stat-row">Strength: {{strength}}</div>
+    <div class="stat-row">Stamina: {{stamina}}</div>
+    <div class="stat-row">Agility: {{agility}}</div>
+    <div class="stat-row">Intellect: {{intellect}}</div>
+    <div class="stat-row">Spirit: {{spirit}}</div>
+    <div class="stat-row">Armor: {{armor}}</div>
+    <div class="stat-row">Crit Chance: {{critChance}}%</div>
+    <div class="stat-row">Dodge Chance: {{dodgeChance}}%</div>
+    <div class="stat-row">Avg Dmg Reduc: {{avgDR}}%</div>
+    <div class="attacks">
+      <div class="stat-row">Attacks:</div>
+      <div *ngFor="let attack of attacks">
+        <div class="stat-row">Dmg: {{attack.minDmg}}-{{attack.maxDmg}} at {{attack.attSpd.toFixed(2)}} speed</div>
+      </div>
     </div>
   </div>
+  <button *ngIf="canUpgradeWeapon" (click)="upgradeWeapon()">Upgrade Weapon?</button>
+  <button *ngIf="canUndoEquip" (click)="undoEquip()">Undo Last Equip?</button>
 </div>

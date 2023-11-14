@@ -14,7 +14,7 @@ export abstract class Entity {
   // image: string;
 
   get maxHp(): number {
-    return Math.round((this.level * 20) + (this.stamina * 10));
+    return Math.round((this.level * 10) + (this.stamina * 5));
   }
 
   get percentDmgUp(): number {
