@@ -10,8 +10,6 @@ export class ItemFilterComponent implements OnInit {
   title = 'Item Filter Settings';
   autoFilterItems = false;
   autoEquipItems = false;
-  // weird hack to only get the values so we can convert to the enum value
-  weightKeys = Object.values(Stat);
   weights: { stat: Stat, weight: number}[] = [];
 
   constructor(
@@ -19,9 +17,7 @@ export class ItemFilterComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    for(let weight of this.weightKeys) {
-      this.weights.push({stat: Stat[weight as keyof typeof Stat], weight: 1});
-    }
+    this.weights = this.itemFilterService._weights;
   }
 
   autoEquip(): void {

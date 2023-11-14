@@ -17,7 +17,17 @@ export class ItemFilterService {
 
   _weights: {stat: Stat, weight: number}[] = [];
 
-  constructor() { }
+  constructor() {
+    const cookies = localStorage.getItem('weights');
+    if(cookies) {
+      this._weights = JSON.parse(cookies).map((w: {stat:string, weight: number}) => ({stat: w.stat as Stat, weight: w.weight}));
+    }
+    for(let key of Object.keys(Stat)) {
+      if(!this._weights.map(w => w.stat).includes(Stat[key as keyof typeof Stat])) {
+        this._weights.push({stat: Stat[key as keyof typeof Stat], weight: 1});
+      }
+    }
+  }
 
   setFiltering(isFiltering: boolean) {
     this._isFiltering = isFiltering;
@@ -25,6 +35,7 @@ export class ItemFilterService {
 
   setWeights(weights: {stat: Stat, weight: number}[]) {
     this._weights = weights;
+    localStorage.setItem('weights', JSON.stringify(weights));
   }
 
   setAutoEquip(isAutoEquiping: boolean) {
