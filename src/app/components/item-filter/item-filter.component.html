@@ -7,12 +7,15 @@
       Automatically filter items?
     </label>
   </div>
-  <div class="checkbox">
+  <div class="checkbox" *ngIf="autoFilterItems">
     <label>
       <input type="checkbox" [(ngModel)]="autoEquipItems" (change)="autoEquip()">
       Automatically equip upgrades? (except Main Hand)
     </label>
   </div>
+
+  <br>
+  <br>
 
   <div *ngIf="autoFilterItems">
     <div *ngFor="let weight of weights" class="row">

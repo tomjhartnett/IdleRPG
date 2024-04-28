@@ -81,3 +81,8 @@
 .thirds {
   width: 30%;
 }
+
+.item-picture {
+  height: 100px;
+  width: 100px;
+}

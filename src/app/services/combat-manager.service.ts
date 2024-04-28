@@ -14,7 +14,7 @@ export class CombatManagerService {
   _currentMonsterWeapon: Weapon = this.itemGeneratorService.generateItem(1, "Common", "Main Hand") as Weapon;
   recentAttacks: { damage: number, source: 'player' | 'monster' }[] = [];
   _rewardItem: Item | undefined;
-  autoEquipReward: Item | undefined;
+  autoEquipRewardName: string | undefined;
   currentTimeout: any;
   combatEnded = false;
   combatNumber = 0;
@@ -42,6 +42,7 @@ export class CombatManagerService {
 
   // does all attacks from both players at combat start
   combatStart() {
+    this.playerManagementService.player.heal();
     this.combatNumber++;
     this.currentCombat = this.combatNumber;
     this.combatEnded = false;
@@ -71,7 +72,7 @@ export class CombatManagerService {
           this.endCombat();
         }
         this.recentAttacks.push({damage: dmg, source: entity instanceof Player ? 'player' : 'monster'});
-      } else if(this._currentMonster.currentHp <= 0 && this.playerManagementService.player.currentHp <= 0) {
+      } else if(this._currentMonster.currentHp <= 0 || this.playerManagementService.player.currentHp <= 0) {
         this.endCombat();
       }
     }
@@ -82,7 +83,6 @@ export class CombatManagerService {
     this.currentCombat = undefined;
     if(this.playerManagementService.player.currentHp > 0) {
       this.playerManagementService.player.addExp(this._currentMonster.xpAwarded);
-      this.playerManagementService.player.heal();
       let slot;
       if (this.playerManagementService.player.inventorySet.slots.get('Main Hand')!.level * 3 < this.playerManagementService.player.level) {
         slot = 'Main Hand';
@@ -99,14 +99,12 @@ export class CombatManagerService {
           }
         }
         if (this.itemFilterService.isAutoEquiping && this._rewardItem.slot != "Main Hand" && (!oldItem || oldItem.lastUpdatedWeight <= this._rewardItem.lastUpdatedWeight)) {
-          this.autoEquipReward = this._rewardItem;
+          this.autoEquipRewardName = this._rewardItem.name;
           if(!this.currentTimeout) {
             this.currentTimeout = setTimeout(() => {
-              if(this.combatEnded) {
-                if (this._rewardItem && this._rewardItem === this.autoEquipReward) {
-                  this.playerManagementService.player.inventorySet.addItem(this._rewardItem);
-                  this.generateMonster();
-                }
+              if (this._rewardItem && this._rewardItem.name === this.autoEquipRewardName) {
+                this.playerManagementService.player.inventorySet.addItem(this._rewardItem);
+                this.generateMonster();
               }
             }, 1000);
           }
@@ -124,6 +122,7 @@ export class CombatManagerService {
   }
 
   generateMonster(level: number = this.playerManagementService.player.level, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss") {
+    console.log('generating monster')
     if(this.playerManagementService.player.currentHp <= 0 || this._currentMonster.currentHp <= 0) {
       this.currentTimeout = undefined;
       if (!rarity) {

@@ -2,6 +2,7 @@
   <div class="combat-container">
     <div class="combat-section player-section">
       <div class="name">{{ playerName }}</div>
+      <img class="item-picture" src="/assets/images/player.jfif" alt="player">
       <div class="health-bar">
         <div class="red-bar" [style.width]="playerHealthPercentage + '%'"></div>
       </div>
@@ -19,6 +20,7 @@
 
     <div class="combat-section monster-section">
       <div class="name">{{ monsterName }}</div>
+      <img class="item-picture" src="/assets/images/{{monsterImage}}.jfif" alt="{{monsterImage}}">
       <div class="health-bar">
         <div class="red-bar" [style.width]="monsterHealthPercentage + '%'"></div>
       </div>

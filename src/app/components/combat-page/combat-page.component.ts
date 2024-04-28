@@ -27,6 +27,9 @@ export class CombatPageComponent implements OnInit {
   get monsterName(): string {
     return this.combatManagerService._currentMonster.name;
   }
+  get monsterImage(): string {
+    return this.combatManagerService._currentMonster.image;
+  }
   get monsterCurrentHP(): number {
     return this.combatManagerService._currentMonster.currentHp;
   }

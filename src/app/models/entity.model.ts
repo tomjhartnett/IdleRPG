@@ -123,6 +123,8 @@ export class Monster extends Entity {
   agility: number = this.getRandomInt(this.rarityPercent) * this.level * 5;
   intellect: number = this.getRandomInt(this.rarityPercent) * this.level * 5;
   spirit: number = this.getRandomInt(this.rarityPercent) * this.level * 5;
+  MAX_MONSTER_IMAGES = 6;
+  image: string = `monster_` + (this.getRandomInt(this.MAX_MONSTER_IMAGES) + 1);
 
   get totalArmor(): number {
     return this.baseArmor;
