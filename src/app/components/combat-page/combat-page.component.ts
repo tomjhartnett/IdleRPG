@@ -24,6 +24,15 @@ export class CombatPageComponent implements OnInit {
   get playerMaxHP(): number {
     return this.playerManagementService.player.maxHp;
   }
+  get playerCurrentMana(): number {
+    return this.playerManagementService.player.currentMana;
+  }
+  get playerMaxMana(): number {
+    return this.playerManagementService.player.maxMana;
+  }
+  get monsterLevel(): string {
+    return this.combatManagerService._currentMonster.level.toFixed(0);
+  }
   get monsterName(): string {
     return this.combatManagerService._currentMonster.name;
   }
@@ -36,12 +45,16 @@ export class CombatPageComponent implements OnInit {
   get monsterMaxHP(): number {
     return this.combatManagerService._currentMonster.maxHp;
   }
-  get recentAttacks(): { damage: number, source: 'player' | 'monster' }[] {
+  get recentAttacks(): { damage: number, source: 'player' | 'monster', timestamp: number, wasCrit: boolean }[] {
     return this.combatManagerService.recentAttacks;
   }
 
   get playerHealthPercentage(): number {
     return (this.playerCurrentHP / this.playerMaxHP) * 100;
+  }
+
+  get playerManaPercentage(): number {
+    return (this.playerCurrentMana / this.playerMaxMana) * 100;
   }
 
   get monsterHealthPercentage(): number {
@@ -59,6 +72,17 @@ export class CombatPageComponent implements OnInit {
     return undefined;
   }
 
+  get recentAttacksDisplay(): { damage: number, source: 'player' | 'monster', timestamp: number, wasCrit: boolean }[] {
+    return this.recentAttacks
+      .slice()
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .slice(-5);
+  }
+
+  get monsterBorderColor(): string {
+    return this.combatManagerService._currentMonster.color;
+  }
+
   constructor(
     private playerManagementService: PlayerManagementService,
     private combatManagerService: CombatManagerService
@@ -74,7 +98,14 @@ export class CombatPageComponent implements OnInit {
     this.combatManagerService.generateMonster();
   }
 
+  discardForSkill() {
+    this.playerManagementService.addSkillPoint();
+    this.retry();
+  }
+
   retry() {
+    this.playerManagementService.player.heal();
+    this.playerManagementService.player.healMana();
     this.combatManagerService.generateMonster();
   }
 }

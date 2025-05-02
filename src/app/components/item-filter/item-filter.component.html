@@ -3,13 +3,13 @@
 
   <div class="checkbox">
     <label>
-      <input type="checkbox" [(ngModel)]="autoFilterItems" (change)="changeWeights()">
+      <input type="checkbox" [ngModel]="autoFilterItems" (change)="changeWeights(true)">
       Automatically filter items?
     </label>
   </div>
   <div class="checkbox" *ngIf="autoFilterItems">
     <label>
-      <input type="checkbox" [(ngModel)]="autoEquipItems" (change)="autoEquip()">
+      <input type="checkbox" [ngModel]="autoEquipItems" (change)="autoEquip()">
       Automatically equip upgrades? (except Main Hand)
     </label>
   </div>

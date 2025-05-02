@@ -3,16 +3,22 @@
     <div class="combat-section player-section">
       <div class="name">{{ playerName }}</div>
       <img class="item-picture" src="/assets/images/player.jfif" alt="player">
+      <div class="health-text">{{ playerCurrentHP }} / {{ playerMaxHP }}</div>
       <div class="health-bar">
         <div class="red-bar" [style.width]="playerHealthPercentage + '%'"></div>
       </div>
-      <div class="health-text">{{ playerCurrentHP }} / {{ playerMaxHP }}</div>
+      <div class="mana-bar">
+        <div class="blue-bar" [style.width]="playerManaPercentage + '%'"></div>
+      </div>
+      <div class="health-text">{{ playerCurrentMana }} / {{ playerMaxMana }}</div>
     </div>
 
     <div class="combat-section attack-section">
       <div class="attack-list">
-        <div *ngFor="let attack of recentAttacks.slice(-5).reverse(); let i = index" [class.fade-out]="i >= 5">
-          <span class="damage">{{ attack.damage }}</span>
+        <div *ngFor="let attack of recentAttacksDisplay; let i = index" [class.fade-out]="i >= 5">
+          <span class="damage" [ngClass]="{'dodge': attack.damage === 0, 'crit': attack.wasCrit }">
+            {{ attack.damage === 0 ? 'Dodge!' : (attack.wasCrit ? attack.damage + '!' : attack.damage) }}
+          </span>
           <span class="arrow">{{ attack.source === 'player' ? '←' : '→' }}</span>
         </div>
       </div>
@@ -20,29 +26,36 @@
 
     <div class="combat-section monster-section">
       <div class="name">{{ monsterName }}</div>
-      <img class="item-picture" src="/assets/images/{{monsterImage}}.jfif" alt="{{monsterImage}}">
+      <img class="item-picture"
+           src="/assets/images/{{ monsterImage }}.jfif"
+           [ngStyle]="{'border': '10px solid ' + monsterBorderColor}"
+           alt="{{monsterImage}}">
       <div class="health-bar">
         <div class="red-bar" [style.width]="monsterHealthPercentage + '%'"></div>
       </div>
       <div class="health-text">{{ monsterCurrentHP }} / {{ monsterMaxHP }}</div>
+      <div class="health-text">Level {{ monsterLevel }}</div>
     </div>
   </div>
   <div class="rewards">
-    <div class="thirds">
+    <div class="quarters bestiary-section">
+      <app-player-bestiary></app-player-bestiary>
+    </div>
+    <div class="quarters">
       <app-item-filter></app-item-filter>
     </div>
-    <div class="thirds" *ngIf="playerCurrentHP <= 0">
+    <div class="quarters" *ngIf="playerCurrentHP <= 0">
       <span>You lose! Click to try again.</span>
       <button (click)="retry()">Try Again</button>
     </div>
-    <div class="thirds" *ngIf="monsterCurrentHP <= 0">
+    <div class="quarters" *ngIf="monsterCurrentHP <= 0">
       <span>You win! Here's your prize.</span>
       <div class="rewards" *ngIf="rewardItem && !combatActive">
         <div>
           <app-inventory-slot [item]="rewardItem"></app-inventory-slot>
           <div>
             <button (click)="equip()">Equip</button>
-            <button (click)="retry()">Discard</button>
+            <button (click)="discardForSkill()">Discard to get skill point</button>
           </div>
           <app-tooltip [item]="rewardItem"></app-tooltip>
         </div>

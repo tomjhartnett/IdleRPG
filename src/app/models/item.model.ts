@@ -6,51 +6,56 @@ export abstract class Item {
   imagePath: string;
   stats: {stat: string, amount: number}[];
   lastUpdatedWeight: number = 0;
+  reinforceLevel: number = 0;
+
+  get reinforceMultiplier(): number {
+    return 1 + 0.1 * (this.reinforceLevel || 0);
+  }
 
   get strength() {
-    let total = 0;
+    let base = 0;
     for(let stat of this.stats) {
       if(stat.stat === 'Strength') {
-        total += stat.amount;
+        base += stat.amount;
       }
     }
-    return total;
+    return Math.ceil(base * this.reinforceMultiplier);
   }
   get stamina() {
-    let total = 0;
+    let base = 0;
     for(let stat of this.stats) {
       if(stat.stat === 'Stamina') {
-        total += stat.amount;
+        base += stat.amount;
       }
     }
-    return total;
+    return Math.ceil(base * this.reinforceMultiplier);
   }
   get agility() {
-    let total = 0;
+    let base = 0;
     for(let stat of this.stats) {
       if(stat.stat === 'Agility') {
-        total += stat.amount;
+        base += stat.amount;
       }
     }
-    return total;
+    return Math.ceil(base * this.reinforceMultiplier);
   }
   get intellect() {
-    let total = 0;
+    let base = 0;
     for(let stat of this.stats) {
       if(stat.stat === 'Intellect') {
-        total += stat.amount;
+        base += stat.amount;
       }
     }
-    return total;
+    return Math.ceil(base * this.reinforceMultiplier);
   }
   get spirit() {
-    let total = 0;
+    let base = 0;
     for(let stat of this.stats) {
       if(stat.stat === 'Spirit') {
-        total += stat.amount;
+        base += stat.amount;
       }
     }
-    return total;
+    return Math.ceil(base * this.reinforceMultiplier);
   }
 
   abstract get type(): string;
@@ -68,19 +73,24 @@ export abstract class Item {
     }
   }
 
-  protected constructor(name: string, slot: string, imagePath: string, level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
+  protected constructor(name: string, slot: string, imagePath: string, level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common", reinforceLevel?: number) {
     this.name = name;
     this.slot = slot;
     this.imagePath = imagePath;
     this.level = level;
     this.stats = stats;
     this.rarity = rarity;
+    this.reinforceLevel = reinforceLevel ?? 0;
   }
 }
 
 export class Armor extends Item {
   armorType: "Cloth" | "Leather" | "Plate";
-  armor: number;
+  _armor: number;
+
+  get armor() {
+    return Math.ceil(this._armor * this.reinforceMultiplier);
+  }
 
   get type(): string {
     return this.armorType;
@@ -92,13 +102,17 @@ export class Armor extends Item {
 
   constructor(name: string, slot: string, imagePath: string, armor: number, armorType: "Cloth" | "Leather" | "Plate", level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
     super(name, slot, imagePath, level, stats, rarity);
-    this.armor = armor;
+    this._armor = armor;
     this.armorType = armorType;
   }
 }
 
 export class Shield extends Item {
-  armor: number;
+  _armor: number;
+
+  get armor() {
+    return Math.ceil(this._armor * this.reinforceMultiplier);
+  }
 
   get type(): string {
     return "Shield";
@@ -110,15 +124,27 @@ export class Shield extends Item {
 
   constructor(name: string, slot: string, imagePath: string, armor: number, level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
     super(name, slot, imagePath, level, stats, rarity);
-    this.armor = armor;
+    this._armor = armor;
   }
 }
 
 export class Weapon extends Item {
-  minDamage: number;
-  maxDamage: number;
-  attackSpeed: number;
+  _minDamage: number;
+  _maxDamage: number;
+  _attackSpeed: number;
   weaponType: string;
+
+  get minDamage() {
+    return Math.ceil(this._minDamage * this.reinforceMultiplier);
+  }
+
+  get maxDamage() {
+    return Math.ceil(this._maxDamage * this.reinforceMultiplier);
+  }
+
+  get attackSpeed() {
+    return parseFloat((this._attackSpeed * this.reinforceMultiplier).toFixed(2));
+  }
 
   get type(): string {
     return this.weaponType;
@@ -134,9 +160,9 @@ export class Weapon extends Item {
 
   constructor(name: string, slot: string, imagePath: string, minDamage: number, maxDamage: number, attackSpeed: number, weaponType: string, level: number, stats: {stat: string, amount: number}[], rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common") {
     super(name, slot, imagePath, level, stats, rarity);
-    this.minDamage = minDamage;
-    this.maxDamage = maxDamage;
-    this.attackSpeed = attackSpeed;
+    this._minDamage = minDamage;
+    this._maxDamage = maxDamage;
+    this._attackSpeed = attackSpeed;
     this.weaponType = weaponType;
   }
 }

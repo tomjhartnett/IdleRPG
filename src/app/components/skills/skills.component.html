@@ -1,0 +1,12 @@
+<div class="skill-container">
+  <div class="skill-row">
+    <p>Available skill points: {{ availableSkillPoints }}</p>
+  </div>
+  <div *ngFor="let skill of skills" class="skill-row" (mouseenter)="setHoverSkill(skill)" (mouseleave)="removeHoverSkill()">
+    <input type="checkbox" [checked]="skill.isEnabled" (click)="toggleEnabled(skill)"/>
+    <img class="item-picture" src="/assets/images/{{skill.image}}.jfif" alt="{{skill.image}}">
+    <span class="skill-level">{{ skill.level }}</span>
+    <button [disabled]="skill.level <= 1" (click)="removePoint(skill)">-</button>
+    <button [disabled]="availableSkillPoints <= 0" (click)="addPoint(skill)">+</button>
+  </div>
+</div>

@@ -8,9 +8,15 @@ import {ItemFilterService, Stat} from "../../services/item-filter.service";
 })
 export class ItemFilterComponent implements OnInit {
   title = 'Item Filter Settings';
-  autoFilterItems = false;
-  autoEquipItems = false;
   weights: { stat: Stat, weight: number}[] = [];
+
+  get autoFilterItems(): boolean {
+    return this.itemFilterService.isFiltering;
+  }
+
+  get autoEquipItems(): boolean {
+    return this.itemFilterService.isAutoEquiping;
+  }
 
   constructor(
     private itemFilterService: ItemFilterService
@@ -21,11 +27,13 @@ export class ItemFilterComponent implements OnInit {
   }
 
   autoEquip(): void {
-    this.itemFilterService.setAutoEquip(this.autoEquipItems);
+    this.itemFilterService.setAutoEquip(!this.autoEquipItems);
   }
 
-  changeWeights(): void {
-    this.itemFilterService.setFiltering(this.autoFilterItems);
+  changeWeights(toggle = false): void {
+    if(toggle) {
+      this.itemFilterService.setFiltering(!this.autoFilterItems);
+    }
     this.itemFilterService.setWeights(this.weights);
   }
 }

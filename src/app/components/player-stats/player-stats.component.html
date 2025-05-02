@@ -1,6 +1,7 @@
 <div>
   <div class="stat-container">
     <div class="stat-row">HP: {{currentHp}}/{{maxHp}}</div>
+    <div class="stat-row">Mana: {{currentMana}}/{{maxMana}}</div>
     <div class="stat-row">Level: {{level}}</div>
     <div class="stat-row">Exp to Level: {{currentXP}}/{{xpToNextLevel}}</div>
     <div class="stat-row">Strength: {{strength}}</div>
@@ -12,6 +13,7 @@
     <div class="stat-row">Crit Chance: {{critChance}}%</div>
     <div class="stat-row">Dodge Chance: {{dodgeChance}}%</div>
     <div class="stat-row">Avg Dmg Reduc: {{avgDR}}%</div>
+    <div class="stat-row">EHP: {{EHP}}/{{maxHp}}</div>
     <div class="attacks">
       <div class="stat-row">Attacks:</div>
       <div *ngFor="let attack of attacks">

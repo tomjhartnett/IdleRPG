@@ -10,6 +10,10 @@ export class TooltipComponent implements OnInit {
 
   @Input() item!: Item;
 
+  get itemLevel(): number {
+    return this.item ? Math.round(this.item.level): 0;
+  }
+
   constructor() { }
 
   ngOnInit(): void {

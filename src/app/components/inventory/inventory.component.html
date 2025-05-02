@@ -2,36 +2,35 @@
   <div class="main">
     <div class="columns">
       <!--  helmet-->
-      <app-inventory-slot [item]="helmet" (mouseenter)="setHoverItem(helmet)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="helmet" (mouseenter)="setHoverItem(helmet)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  necklace-->
-      <app-inventory-slot [item]="necklace" (mouseenter)="setHoverItem(necklace)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="necklace" (mouseenter)="setHoverItem(necklace)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  shoulders-->
-      <app-inventory-slot [item]="shoulders" (mouseenter)="setHoverItem(shoulders)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="shoulders" (mouseenter)="setHoverItem(shoulders)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  cape-->
-      <app-inventory-slot [item]="cape" (mouseenter)="setHoverItem(cape)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="cape" (mouseenter)="setHoverItem(cape)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  chest-->
-      <app-inventory-slot [item]="chest" (mouseover)="setHoverItem(chest)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="chest" (mouseover)="setHoverItem(chest)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  wrists-->
-      <app-inventory-slot [item]="wrists" (mouseover)="setHoverItem(wrists)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="wrists" (mouseover)="setHoverItem(wrists)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  mainhand-->
-      <app-inventory-slot [item]="mainhand" (mouseover)="setHoverItem(mainhand)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="mainhand" (mouseover)="setHoverItem(mainhand)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
     </div>
     <div class="columns">
       <!--  hands-->
-      <app-inventory-slot [item]="hands" (mouseover)="setHoverItem(hands)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="hands" (mouseover)="setHoverItem(hands)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  belt-->
-      <app-inventory-slot [item]="belt" (mouseover)="setHoverItem(belt)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="belt" (mouseover)="setHoverItem(belt)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  legs-->
-      <app-inventory-slot [item]="legs" (mouseover)="setHoverItem(legs)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="legs" (mouseover)="setHoverItem(legs)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  feet-->
-      <app-inventory-slot [item]="feet" (mouseover)="setHoverItem(feet)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="feet" (mouseover)="setHoverItem(feet)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  ring-->
-      <app-inventory-slot [item]="ring" (mouseover)="setHoverItem(ring)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="ring" (mouseover)="setHoverItem(ring)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  trinket-->
-      <app-inventory-slot [item]="trinket" (mouseover)="setHoverItem(trinket)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="trinket" (mouseover)="setHoverItem(trinket)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
       <!--  offhand-->
-      <app-inventory-slot [item]="offhand" (mouseover)="setHoverItem(offhand)" (mouseleave)="showTooltip=false"></app-inventory-slot>
+      <app-inventory-slot [item]="offhand" (mouseover)="setHoverItem(offhand)" (mouseleave)="removeHoverItem()"></app-inventory-slot>
     </div>
   </div>
-  <app-tooltip class="left" *ngIf="showTooltip" [item]="hoverItem"></app-tooltip>
 </div>

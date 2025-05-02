@@ -1,0 +1,18 @@
+<h2 class="bestiary-title">Bestiary (requires lvl {{bestiaryLevel}})</h2>
+<table class="bestiary-table">
+  <tr>
+    <th>Affix</th>
+    <th>Stat</th>
+    <th>#</th>
+    <th>Bonus</th>
+  </tr>
+  <tr *ngFor="let entry of bestiaryData">
+    <td>{{ entry.suffix }}</td>
+    <td>{{ entry.bonus.stat }}</td>
+    <td>{{ entry.count }}</td>
+    <td>
+      +{{ entry.bonus.flat * entry.count }},
+      +{{ (entry.bonus.percent * entry.count * 100) | number:'1.0-2' }}%
+    </td>
+  </tr>
+</table>

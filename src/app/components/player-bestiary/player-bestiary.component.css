@@ -1,0 +1,44 @@
+.bestiary-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.bestiary-table th,
+.bestiary-table td {
+  text-align: center;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  word-wrap: break-word;
+}
+
+/* Column widths based on 2-2-1-2 distribution */
+.bestiary-table th:nth-child(1),
+.bestiary-table td:nth-child(1) {
+  width: 35%; /* Affix */
+}
+
+.bestiary-table th:nth-child(2),
+.bestiary-table td:nth-child(2) {
+  width: 20%; /* Stat */
+}
+
+.bestiary-table th:nth-child(3),
+.bestiary-table td:nth-child(3) {
+  width: 10%; /* Count */
+}
+
+.bestiary-table th:nth-child(4),
+.bestiary-table td:nth-child(4) {
+  width: 25%; /* Bonus */
+}
+
+.bestiary-title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.bestiary-table th {
+  font-weight: bold;
+  border-bottom: 1px solid #bbb;
+}

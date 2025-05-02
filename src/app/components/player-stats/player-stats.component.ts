@@ -15,6 +15,12 @@ export class PlayerStatsComponent implements OnInit {
   get maxHp(): number {
     return this.playerManagementService.player.maxHp;
   }
+  get currentMana(): number {
+    return this.playerManagementService.player.currentMana;
+  }
+  get maxMana(): number {
+    return this.playerManagementService.player.maxMana;
+  }
   get strength(): number {
     return this.playerManagementService.player.strength;
   }
@@ -60,6 +66,9 @@ export class PlayerStatsComponent implements OnInit {
   get canUndoEquip(): boolean {
     return !!this.playerManagementService.lastReplacedItem
   }
+  get EHP(): string {
+    return this.playerManagementService.player.EHP.toFixed(0);
+  }
 
   constructor(
     private playerManagementService: PlayerManagementService,
@@ -70,8 +79,9 @@ export class PlayerStatsComponent implements OnInit {
   }
 
   upgradeWeapon() {
-    if(confirm("Upgrading your weapon tier will destroy the rest of your equipment and reset your character to level 1. This can be useful if your fights are taking a long time because you can't get a good weapon drop. Are you sure you want to continue?")) {
+    if (confirm("Upgrading your weapon tier will destroy the rest of your equipment and reset your character to level 1. This can be useful if your fights are taking a long time because you can't get a good weapon drop. Are you sure you want to continue?")) {
       this.playerManagementService.upgradeWeapon();
+      this.combatManagerService.resetCombatState();
       this.combatManagerService.generateMonster();
     }
   }

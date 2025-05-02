@@ -11,12 +11,6 @@ import {Item} from "../../models/item.model";
 export class InventoryComponent implements OnInit {
 
   inventoryObservable: BehaviorSubject<boolean>;
-  showTooltip = false;
-  _hoverItem!: Item;
-
-  get hoverItem(): Item {
-    return this._hoverItem;
-  }
 
   get slots() {
     return this.playerManagementService.playerSet.slots;
@@ -85,8 +79,12 @@ export class InventoryComponent implements OnInit {
 
   setHoverItem(item: Item | undefined) {
     if (item) {
-      this._hoverItem = item;
-      this.showTooltip = true;
+      this.playerManagementService._hoverItem = item;
+      this.playerManagementService.showTooltip = true;
     }
+  }
+
+  removeHoverItem() {
+    this.playerManagementService.showTooltip = false;
   }
 }

@@ -1,0 +1,9 @@
+<div class="item-tooltip">
+  <div class="tooltip-row title">{{skill.name}}</div>
+  <div class="tooltip-row item-level-color">Skill Level {{skill.level}}</div>
+  <div *ngFor="let line of skill.tooltipLines">
+    <div class="aside-text-container">
+      <div class="tooltip-row">{{line}}</div>
+    </div>
+  </div>
+</div>

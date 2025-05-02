@@ -1,0 +1,34 @@
+<div class="smithing-page">
+  <h2 class="smithing-title">Smithing Upgrades</h2>
+  <div class="gold-count">Gold (from kills): {{ gold.toFixed(0) }}</div>
+
+  <div class="smithing-grid">
+    <div class="smithing-row" *ngFor="let row of slotRows">
+      <div
+        *ngFor="let item of row"
+        class="smithing-slot"
+        [class.selected]="item === selectedItem"
+        [class.empty]="!item"
+        (click)="item && selectItem(item)"
+      >
+        <app-inventory-slot [item]="item"></app-inventory-slot>
+        <div *ngIf="item" class="smithing-level">+{{ item.reinforceLevel || 0 }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="selectedItem" class="smithing-details">
+    <h3>Upgrade Preview</h3>
+    <div class="upgrade-cost">
+      Upgrade to +{{ selectedItem.reinforceLevel + 1 }} (Cost: {{ getUpgradeCost(selectedItem).toFixed(0) }} Gold)
+    </div>
+
+    <div class="stat-preview" *ngFor="let stat of getBoostedStats(selectedItem)">
+      +{{ stat.amount }} {{ stat.name }}
+    </div>
+
+    <button class="upgrade-btn" [disabled]="gold < getUpgradeCost(selectedItem)" (click)="upgradeSelectedItem()">
+      Upgrade Item
+    </button>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-.stat-container {
+.item-tooltip {
   background-color: #333;
   color: #fff;
   padding: 10px;
@@ -7,23 +7,21 @@
   width: 200px;
 }
 
-.stat-row {
+.tooltip-row {
   margin-bottom: 5px;
   font-size: 14px;
 }
 
-.attacks {
-  padding: 4px;
-  border: 1px solid #666;
-  border-radius: 5px;
+.item-level-color {
+  color: #ffcc00; /* Sample color 1 */
 }
 
-.red {
-  background-color: #ff5555;
+.title {
+  font-size: 20px;
+  color: #515fed;
 }
 
-.rows {
+.aside-text-container {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
 }
-
