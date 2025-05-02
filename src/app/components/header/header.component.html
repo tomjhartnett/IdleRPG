@@ -4,6 +4,12 @@
     <mat-icon class="icon-buttons" (click)="setPage('smithing')">construction</mat-icon>
   </div>
   <div class="right-section">
+    <div class="testing-toggle">
+      <label>
+        <input type="checkbox" [checked]="!isTestingMode" (change)="toggleTestingMode()" />
+        Testing Mode
+      </label>
+    </div>
     <span class="welcome-text">Welcome, Hero</span>
     <button class="logout-button">Logout</button>
   </div>

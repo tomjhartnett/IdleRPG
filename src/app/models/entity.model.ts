@@ -17,11 +17,11 @@ export abstract class Entity {
   abstract get totalArmor(): number;
 
   get maxHp(): number {
-    return Math.round((this.level * 10) + (this.stamina * 10));
+    return Math.round((this.level * 10) + (this.stamina * 3));
   }
 
   get percentDmgUp(): number {
-    return this.strength * 2;
+    return this.strength / 10;
   }
 
   get baseArmor(): number {
@@ -273,7 +273,7 @@ export class Monster extends Entity {
 
     // Ratio: monster damage percent / player damage percent
     const fightMultiplier  = Math.min(3, lastFightHpRatio ?? 1);  // Max 3x scaling, default 1x
-    const scalingMultiplier = 1 + Math.pow(totalKills / 100, 1.3); // exponential scale
+    const scalingMultiplier = 1 + Math.pow(totalKills / 500, 1.01); // exponential scale
 
     const difficultyMultiplier = fightMultiplier * scalingMultiplier;
 

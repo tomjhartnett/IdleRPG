@@ -15,11 +15,19 @@
 
     <div class="combat-section attack-section">
       <div class="attack-list">
-        <div *ngFor="let attack of recentAttacksDisplay; let i = index" [class.fade-out]="i >= 5">
-          <span class="damage" [ngClass]="{'dodge': attack.damage === 0, 'crit': attack.wasCrit }">
-            {{ attack.damage === 0 ? 'Dodge!' : (attack.wasCrit ? attack.damage + '!' : attack.damage) }}
-          </span>
-          <span class="arrow">{{ attack.source === 'player' ? '←' : '→' }}</span>
+        <div *ngFor="let attack of recentAttacksDisplay; let i = index" [class.fade-out]="i >= 5" class="attack-entry">
+          <div class="left-column">
+        <span *ngIf="attack.source === 'player'" class="damage" [ngClass]="{'dodge': attack.damage === 0, 'crit': attack.wasCrit}">
+          {{ attack.damage === 0 ? 'Dodge!' : (attack.wasCrit ? attack.damage + '!' : attack.damage) }}
+        </span>
+            <span *ngIf="attack.source === 'monster'" class="arrow">←</span>
+          </div>
+          <div class="right-column">
+        <span *ngIf="attack.source === 'monster'" class="damage" [ngClass]="{'dodge': attack.damage === 0, 'crit': attack.wasCrit}">
+          {{ attack.damage === 0 ? 'Dodge!' : (attack.wasCrit ? attack.damage + '!' : attack.damage) }}
+        </span>
+            <span *ngIf="attack.source === 'player'" class="arrow">→</span>
+          </div>
         </div>
       </div>
     </div>

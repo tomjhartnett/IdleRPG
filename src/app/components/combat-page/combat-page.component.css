@@ -25,6 +25,7 @@
 .name {
   font-size: 20px;
   font-weight: bold;
+  padding: 3px;
 }
 
 .mana-bar {
@@ -72,15 +73,6 @@
 
 .attack-list {
   width: 80%;
-}
-
-.attack-list div {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  padding: 5px;
-  background-color: #fff;
-  border: 1px solid #ccc;
 }
 
 .attack-list div.fade-out {
@@ -142,3 +134,34 @@
   font-weight: bold;
   border-bottom: 1px solid #bbb;
 }
+
+.attack-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  background-color: #fff;
+  width: 100%;
+}
+
+.left-column, .right-column {
+  flex: 1;
+  padding: 4px 8px;
+}
+
+.left-column {
+  text-align: left;
+}
+
+.right-column {
+  text-align: right;
+}
+
+.damage {
+  font-weight: bold;
+}
+
+.arrow {
+  font-size: 18px;
+}
+

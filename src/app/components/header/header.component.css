@@ -47,3 +47,16 @@
 .logout-button:hover {
   background-color: #0056b3;
 }
+
+.testing-toggle {
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+}
+
+.testing-toggle input {
+  margin-right: 6px;
+  cursor: pointer;
+}

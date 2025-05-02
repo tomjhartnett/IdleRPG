@@ -40,7 +40,7 @@ export class PlayerManagementService {
 
   get canUpgradeWeapon(): boolean {
     const weapon = this.player.inventorySet.slots.get('Main Hand');
-    return !!weapon && weapon.rarity != 'Legendary' && weapon.level <= this.player.level * 2;
+    return !!weapon && weapon.rarity != 'Mythic' && weapon.level <= this.player.level * 2;
   }
 
   get bestiaryKillCount(): number {
@@ -67,8 +67,10 @@ export class PlayerManagementService {
     const oldWeapon = this.playerSet.slots.get('Main Hand');
     if(oldWeapon) {
       const oldRarity = oldWeapon.rarity;
-      let newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Uncommon";
-      if(oldRarity == "Epic") {
+      let newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Uncommon";
+      if(oldRarity == "Legendary") {
+        newRarity = "Mythic";
+      } else if(oldRarity == "Epic") {
         newRarity = "Legendary";
       } else if(oldRarity == "Rare") {
         newRarity = "Epic";

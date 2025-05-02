@@ -69,6 +69,9 @@ export class PlayerStatsComponent implements OnInit {
   get EHP(): string {
     return this.playerManagementService.player.EHP.toFixed(0);
   }
+  get gold(): string {
+    return this.playerManagementService.gold.toFixed(0);
+  }
 
   constructor(
     private playerManagementService: PlayerManagementService,

@@ -26,6 +26,8 @@
     <div class="stat-preview" *ngFor="let stat of getBoostedStats(selectedItem)">
       +{{ stat.amount }} {{ stat.name }}
     </div>
+    <div *ngIf="getDpsIncrease(selectedItem) > 0">+{{ getDpsIncrease(selectedItem) }} DPS</div>
+    <div *ngIf="getEhpIncrease(selectedItem) > 0">+{{ getEhpIncrease(selectedItem) }} EHP</div>
 
     <button class="upgrade-btn" [disabled]="gold < getUpgradeCost(selectedItem)" (click)="upgradeSelectedItem()">
       Upgrade Item

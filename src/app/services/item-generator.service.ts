@@ -32,7 +32,7 @@ export class ItemGeneratorService {
     this._itemName.set("Dagger", ["Dagger", "Blade"]);
   }
 
-  generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Random", slot?: string, avoidWeapon?: boolean, minRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): Item {
+  generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" | "Random", slot?: string, avoidWeapon?: boolean, minRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): Item {
     if (!rarity || rarity === "Random") {
       rarity = this.getRandomRarity(minRarity); // uses Common as fallback min
     }
@@ -65,7 +65,7 @@ export class ItemGeneratorService {
     return item!;
   }
 
-  getMinDropRarity(monsterRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss"): "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" {
+  getMinDropRarity(monsterRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss"): "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" {
     switch (monsterRarity) {
       case "Boss": return "Legendary";
       case "Legendary": return "Epic";
@@ -77,15 +77,16 @@ export class ItemGeneratorService {
     }
   }
 
-  private getRandomRarity(minRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" {
-    const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary"] as const;
+  private getRandomRarity(minRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" {
+    const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"] as const;
     const minIndex = rarityOrder.indexOf(minRarity);
     const roll = this._getRandomInt(100);
 
-    let rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common";
-    if (roll > 98) rarity = "Legendary";
-    else if (roll > 95) rarity = "Epic";
-    else if (roll > 80) rarity = "Rare";
+    let rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic";
+    if (roll === 99) rarity = 'Mythic';
+    else if (roll > 96) rarity = "Legendary";
+    else if (roll > 89) rarity = "Epic";
+    else if (roll > 75) rarity = "Rare";
     else if (roll > 50) rarity = "Uncommon";
     else rarity = "Common";
 
@@ -93,7 +94,7 @@ export class ItemGeneratorService {
     return rarityOrder[Math.max(rolledIndex, minIndex)];
   }
 
-  upgradeWeapon(weapon: Weapon, newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary"): Weapon {
+  upgradeWeapon(weapon: Weapon, newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic"): Weapon {
     weapon._minDamage = Math.round(weapon.level * (1 + (this.getRaritySkewPercent(newRarity) / 100)));
     weapon._maxDamage = Math.round(weapon.level * 1.5 * (1 + (2 * (this.getRaritySkewPercent(newRarity) / 100))));
     weapon.stats = this.getRandomStats(weapon.level, newRarity);
@@ -101,7 +102,7 @@ export class ItemGeneratorService {
     return weapon;
   }
 
-  getWeaponStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary", type?: string): {
+  getWeaponStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic", type?: string): {
     minDamage: number;
     maxDamage: number;
     attackSpeed: number;
@@ -126,14 +127,14 @@ export class ItemGeneratorService {
     }
   }
 
-  getShieldStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): {armor: number, stats: {stat: string, amount: number}[]} {
+  getShieldStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): {armor: number, stats: {stat: string, amount: number}[]} {
     return {
       armor: Math.round(level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
       stats: this.getRandomStats(level, rarity)
     };
   }
 
-  getArmorStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" = "Common"): {armor: number, armorType: "Cloth" | "Leather" | "Plate", stats: {stat: string, amount: number}[]} {
+  getArmorStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): {armor: number, armorType: "Cloth" | "Leather" | "Plate", stats: {stat: string, amount: number}[]} {
     return {
       armor: Math.round(level * 2 * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
       armorType: this.getRandomArmorType(),
@@ -143,12 +144,13 @@ export class ItemGeneratorService {
 
   getRandomStats(
     level: number,
-    rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary",
+    rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic",
     preferredStats: string[] = []
   ): {stat: string, amount: number}[] {
     const statNames = ["Strength", "Stamina", "Agility", "Intellect", "Spirit"];
     let draws = 0;
     switch (rarity) {
+      case "Mythic": draws = 5; break;
       case "Legendary": draws = 4; break;
       case "Epic": draws = 3; break;
       case "Rare": draws = 2; break;
@@ -188,13 +190,14 @@ export class ItemGeneratorService {
     }
   }
 
-  getRaritySkewPercent(rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary"): number {
+  getRaritySkewPercent(rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic"): number {
     switch (rarity) {
-      case "Common": return  10;
-      case "Uncommon": return 20;
-      case "Rare": return 40;
-      case "Epic": return 80;
-      case "Legendary": return 160;
+      case "Common": return 5;
+      case "Uncommon": return 12;
+      case "Rare": return 25;
+      case "Epic": return 40;
+      case "Legendary": return 60;
+      case "Mythic": return 90;
       default: return 10;
     }
   }
@@ -207,13 +210,25 @@ export class ItemGeneratorService {
   }
 
   getPrefixForRarity(rarity?: string): string {
+    const common = this._prefixes.slice(0, 10);
+    const uncommon = this._prefixes.slice(10, 20);
+    const rare = this._prefixes.slice(20, 30);
+    const epic = this._prefixes.slice(30, 40);
+    const legendary = this._prefixes.slice(40, 50);
+    const mythic = this._prefixes.slice(50, 60);
+
     switch (rarity) {
-      case "Legendary": return "Mythic";
-      case "Epic": return "Shadowed";
-      case "Rare": return "Enchanted";
-      case "Uncommon": return this._prefixes[this._getRandomInt(this._prefixes.length)];
-      default: return this._prefixes[this._getRandomInt(this._prefixes.length)];
+      case "Mythic": return this._randomFrom(mythic);
+      case "Legendary": return this._randomFrom(legendary);
+      case "Epic": return this._randomFrom(epic);
+      case "Rare": return this._randomFrom(rare);
+      case "Uncommon": return this._randomFrom(uncommon);
+      default: return this._randomFrom(common);
     }
+  }
+
+  _randomFrom(arr: string[]): string {
+    return arr[this._getRandomInt(arr.length)];
   }
 
   getSuffixFromStats(stats?: {stat: string, amount: number}[]): string {
@@ -240,9 +255,18 @@ export class ItemGeneratorService {
   }
 
   _prefixes = [
-    "Ancient", "Cracked", "Burnished", "Runed", "Polished", "Savage", "Sturdy", "Mystic",
-    "Spiked", "Ornate", "Glinting", "Corroded", "Silent", "Rugged", "Twisted", "Serrated",
-    "Shimmering", "Honed", "Blessed", "Cursed", "Ironbound", "Bone", "Demonic", "Celestial"
+    // Common
+    "Cracked", "Rugged", "Plain", "Rusty", "Splintered", "Bent", "Faded", "Tarnished", "Simple", "Chipped",
+    // Uncommon
+    "Polished", "Sturdy", "Honed", "Runed", "Ornate", "Spiked", "Silent", "Glinting", "Tempered", "Refined",
+    // Rare
+    "Enchanted", "Mystic", "Blessed", "Cursed", "Shimmering", "Serrated", "Warded", "Engraved", "Arcane", "Shadowy",
+    // Epic
+    "Shadowed", "Twisted", "Demonic", "Bloodforged", "Gleaming", "Darkforged", "Phantom", "Hexed", "Voidbound", "Frosted",
+    // Legendary
+    "Eternal", "Celestial", "Ironbound", "Sunforged", "Hellborn", "Starforged", "Draconic", "Mythwoven", "Emberforged", "Spiritbound",
+    // Mythic
+    "Primordial", "Godforged", "Ancient", "Titanforged", "Worldsplitter", "Astral", "Runebound", "Netherborn", "Firstborn", "Originbound"
   ];
   _suffixesByStat = {
     Strength: ["Bear", "Bull", "Mountain", "Titan"],
@@ -260,7 +284,7 @@ export class ItemGeneratorService {
     return adjs[this._getRandomInt(adjs.length)];
   }
 
-  // generates a number from 0 to max
+  // generates a number from 0 to max - 1
   _getRandomInt(max: number): number {
     return Math.floor(Math.random() * max);
   }

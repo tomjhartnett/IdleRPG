@@ -9,7 +9,7 @@ import {ItemFilterService} from "./item-filter.service";
   providedIn: 'root'
 })
 export class CombatManagerService {
-  is_testing_mode = true;
+  is_testing_mode = false;
 
   isPaused = false;
   _currentMonster: Monster = new Monster(1, "Common");
@@ -24,7 +24,10 @@ export class CombatManagerService {
   private monsterGenerated = false;
   lastMonsterHpRatio: number = 1;
   totalKills = 0;
-  defaultTick = !this.is_testing_mode ? 1000 : 1;
+
+  get defaultTick(): number {
+    return !this.is_testing_mode ? 500 : 1;
+  }
 
   get combatActive(): boolean {
     return !this.combatEnded;

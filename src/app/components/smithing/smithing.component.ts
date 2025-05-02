@@ -17,8 +17,8 @@ export class SmithingComponent implements OnInit {
 
   get slotRows(): (Item | undefined)[][] {
     const allItems = this.slotOrder.map(slot => this.playerService.playerSet.slots.get(slot));
-    while (allItems.length < 16) allItems.push(undefined);
-    return [allItems.slice(0, 8), allItems.slice(8, 16)];
+    while (allItems.length < 14) allItems.push(undefined);
+    return [allItems.slice(0, 7), allItems.slice(7, 14)];
   }
 
   constructor(public playerService: PlayerManagementService) {}
@@ -74,6 +74,62 @@ export class SmithingComponent implements OnInit {
     return boosts;
   }
 
+  getDpsIncrease(item: Item): number {
+    if (!(item instanceof Weapon)) return 0;
+
+    const reinforce = item.reinforceLevel || 0;
+    const currMult = 1 + (0.1 * reinforce);
+    const nextMult = 1 + (0.1 * (reinforce + 1));
+    const player = this.playerService.player;
+
+    // Strength bonus from the item's own stat at +1
+    const baseStrength = item.stats.find(s => s.stat === 'Strength')?.amount || 0;
+    const currentStrengthBonus = baseStrength * currMult;
+    const nextStrengthBonus = baseStrength * nextMult;
+    const extraStrength = Math.ceil(nextStrengthBonus - currentStrengthBonus);
+
+    const currentStrength = player.strength;
+    const nextStrength = currentStrength + extraStrength;
+    const currDmgMult = 1 + (player.percentDmgUp / 100);
+    const dmgMult = 1 + ((nextStrength / 10) / 100);
+
+    const baseMin = Math.floor(item.minDamage * currDmgMult);
+    const baseMax = Math.ceil(item.maxDamage * currDmgMult);
+    const baseSpd = item.attackSpeed;
+    const currDps = (baseMin + baseMax) / baseSpd;
+
+    const nextMin = Math.floor(Math.ceil(item._minDamage * nextMult) * dmgMult);
+    const nextMax = Math.ceil(Math.ceil(item._maxDamage * nextMult) * dmgMult);
+    const nextSpd = parseFloat((item._attackSpeed / nextMult).toFixed(2));
+    const nextDps = (nextMin + nextMax) / nextSpd;
+
+    // console.log(dmgMult, currDps, nextDps)
+
+    return parseFloat((nextDps - currDps).toFixed(2));
+  }
+
+  getEhpIncrease(item: Item): number {
+
+    const player = this.playerService.player;
+    let newTotalArmor = player.totalArmor;
+    if (item instanceof Armor || item instanceof Shield) {
+      const oldArmor = item._armor * item.reinforceMultiplier;
+      const newArmor = item._armor * (1 + 0.1 * ((item.reinforceLevel || 0) + 1));
+
+      const baseArmor = player.totalArmor - oldArmor;
+      newTotalArmor = baseArmor + newArmor;
+    }
+
+    const hp = player.maxHp;
+    const dodge = player.dodgeChance / 100;
+    const oldDr = player.DR;
+    const newDr = Math.min(0.9, newTotalArmor / (newTotalArmor + 400 + (100 * player.level)));
+
+    const oldEhp = Math.round(hp / (1 - oldDr) / (1 - dodge));
+    const newEhp = Math.round(hp / (1 - newDr) / (1 - dodge));
+
+    return newEhp - oldEhp;
+  }
 
 
   upgradeSelectedItem(): void {
