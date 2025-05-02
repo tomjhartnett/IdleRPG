@@ -111,9 +111,9 @@ export class ItemGeneratorService {
     const statBias = this.getStatBiasForWeapon(type);
 
     return {
-      minDamage: Math.round(level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity) / 2) + this.getRaritySkewPercent(rarity)) / 100))),
-      maxDamage: Math.round(level * 1.5 * (1 + (2 * (this._getRandomInt(this.getRaritySkewPercent(rarity) / 2) + this.getRaritySkewPercent(rarity)) / 100))),
-      attackSpeed: 1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100),
+      minDamage: Math.round(2 * level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity) / 2) + this.getRaritySkewPercent(rarity)) / 100))),
+      maxDamage: Math.round(2 * level * 1.5 * (1 + (2 * (this._getRandomInt(this.getRaritySkewPercent(rarity) / 2) + this.getRaritySkewPercent(rarity)) / 100))),
+      attackSpeed: 1.5 - (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100),
       stats: this.getRandomStats(level, rarity, statBias)
     };
   }

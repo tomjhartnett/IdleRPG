@@ -26,7 +26,7 @@ export class CombatManagerService {
   totalKills = 0;
 
   get defaultTick(): number {
-    return !this.is_testing_mode ? 500 : 1;
+    return !this.is_testing_mode ? 1000 : 1;
   }
 
   get combatActive(): boolean {
