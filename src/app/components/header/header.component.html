@@ -1,19 +1,48 @@
 <div class="header-container">
   <div class="left-section">
-    <mat-icon class="icon-buttons" (click)="setPage('home')">home</mat-icon>
-    <mat-icon class="icon-buttons" (click)="setPage('smithing')">construction</mat-icon>
+    <mat-icon class="icon-buttons" (click)="setPage('home')" title="Home">home</mat-icon>
+    <!-- Smithing: hidden until unlocked, then flashes once -->
+    <mat-icon
+      *ngIf="smithingUnlocked"
+      class="icon-buttons"
+      [ngClass]="{ flash: smithingAlert }"
+      (click)="setPage('smithing')"
+      title="Smithing"
+    >construction</mat-icon>
+    <mat-icon
+      *ngIf="relicsUnlocked"
+      class="icon-buttons"
+      [ngClass]="{ flash: relicAlert }"
+      (click)="setPage('relics')"
+      title="Relics"
+    >extension</mat-icon>
+    <mat-icon
+      *ngIf="prestigeUnlocked"
+      class="icon-buttons"
+      [ngClass]="{ flash: prestigeAlert }"
+      (click)="setPage('prestige')"
+      title="Prestige"
+    >
+      star
+    </mat-icon>
   </div>
   <div class="right-section">
     <div class="testing-toggle">
       <label>
-        <input type="checkbox" [checked]="!isShowingPercents" (change)="toggleTooltipPercents()" />
+        <input type="checkbox" [checked]="isShowingPercents" (change)="toggleTooltipPercents()" />
         Show Item Percents?
       </label>
     </div>
     <div class="testing-toggle">
       <label>
-        <input type="checkbox" [checked]="!isTestingMode" (change)="toggleTestingMode()" />
-        Testing Mode
+        <input type="checkbox" [checked]="isTestingMode" (change)="toggleTestingMode()" />
+        Auto
+      </label>
+    </div>
+    <div class="testing-toggle">
+      <label>
+        <input type="checkbox" [checked]="isFastMode" (change)="toggleFastMode()" />
+        Fast Mode
       </label>
     </div>
     <span class="welcome-text">Welcome, Hero</span>

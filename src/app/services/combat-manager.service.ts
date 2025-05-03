@@ -4,12 +4,15 @@ import {ItemGeneratorService} from "./item-generator.service";
 import {Entity, Monster, Player} from "../models/entity.model";
 import {Item, Weapon} from "../models/item.model";
 import {ItemFilterService} from "./item-filter.service";
+import {RelicManagerService} from "./relic-manager.service";
+import {PrestigeService} from "./prestige.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class CombatManagerService {
   is_testing_mode = false;
+  is_slow_test_mode = true;
 
   showPercents = false;
   isPaused = false;
@@ -27,7 +30,7 @@ export class CombatManagerService {
   totalKills = 0;
 
   get defaultTick(): number {
-    return !this.is_testing_mode ? 1000 : 1;
+    return this.is_testing_mode && !this.is_slow_test_mode ? 1 : 1000;
   }
 
   get combatActive(): boolean {
@@ -45,7 +48,9 @@ export class CombatManagerService {
   constructor(
     private itemGeneratorService: ItemGeneratorService,
     private playerManagementService: PlayerManagementService,
-    private itemFilterService: ItemFilterService
+    private itemFilterService: ItemFilterService,
+    private relicService: RelicManagerService,
+    private prestigeService: PrestigeService
   ) {
     if(this.is_testing_mode) {
       this.itemFilterService.setFiltering(true);
@@ -64,6 +69,13 @@ export class CombatManagerService {
   setCombatTimeout(callback: () => void, delay: number): void {
     const timeout = setTimeout(callback, delay);
     this.timeouts.push(timeout);
+  }
+
+  get playerSpeedMult(): number {
+    // apply speed reduction, clamped so you never go to zero or negative
+    const speedRed = Math.min(0.95, this.relicService.totalSpeedReduction);
+    const speedMult = Math.max(0.05, 1 - speedRed);
+    return this.defaultTick * speedMult;
   }
 
   combatStart() {
@@ -88,10 +100,9 @@ export class CombatManagerService {
     for (let attack of this.playerAttacks) {
       this.setCombatTimeout(() => {
         this.doAttack(attack, player.critChance, this._currentMonster, combatId);
-      }, attack.attSpd * this.defaultTick);
+      }, attack.attSpd * this.playerSpeedMult);
     }
   }
-
 
   doAttack(
     attack: {minDmg: number, maxDmg: number, attSpd: number},
@@ -121,7 +132,7 @@ export class CombatManagerService {
     if (target.currentHp > 0 && player.currentHp > 0) {
       this.setCombatTimeout(() => {
         this.doAttack(attack, critChance, target, combatId);
-      }, attack.attSpd * this.defaultTick);
+      }, target instanceof Monster ? attack.attSpd * this.playerSpeedMult : attack.attSpd * this.defaultTick);
     } else {
       this.endCombat();
     }
@@ -173,7 +184,14 @@ export class CombatManagerService {
       this._currentMonster.level
     );
 
-    player.addExp(Math.round(this._currentMonster.xpAwarded * (2 - Math.min(1, this.lastMonsterHpRatio))));
+    const baseExp = Math.round(this._currentMonster.xpAwarded * (2 - Math.min(1, this.lastMonsterHpRatio)));
+    const relicExpBonus = this.relicService.totalExpBonusPercent;
+    const finalExp = Math.round(baseExp * (1 + relicExpBonus));
+    player.addExp(finalExp);
+    this.relicService.addExp(finalExp);
+    this.prestigeService.addXp(1);
+
+    this.playerManagementService.checkUnlocks();
 
     const mainHand = player.inventorySet.slots.get('Main Hand')! as Weapon;
     const slot = mainHand.level * 3 < player.level ? 'Main Hand' : undefined;
@@ -267,7 +285,7 @@ export class CombatManagerService {
     let wasCrit = false;
 
     if (Math.floor(Math.random() * 100) + 1 <= critChance) {
-      critDmgBonus = 2;
+      critDmgBonus = 2 + this.relicService.totalCritDmgBonus;
       wasCrit = true;
     }
 

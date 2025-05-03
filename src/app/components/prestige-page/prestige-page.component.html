@@ -1,0 +1,50 @@
+<div class="prestige-page">
+  <h1 class="page-title">Prestige Paths</h1>
+
+  <p class="intro">
+    Once you’ve grown strong, choose one of five Prestige Paths to unlock powerful passives!
+    You earn 1 Prestige XP per monster kill.
+    Spend XP to unlock three tiers of perks—one choice per tier—and specialize your hero’s build forever.
+  </p>
+
+  <!-- path selection -->
+  <div *ngIf="!current" class="path-selection">
+    <div class="path-card" *ngFor="let p of paths" (click)="selectPath(p.id)">
+      <h3>{{ p.name }}</h3>
+      <p>{{ p.description }}</p>
+    </div>
+  </div>
+
+  <!-- path detail -->
+  <div *ngIf="current" class="path-detail">
+    <button (click)="deselectPath()">← Choose Another Path</button>
+<!--    <button (click)="resetProgress()">Reset Tree Progress</button>-->
+    <h2>{{ current.name }}</h2>
+    <p class="xp-display">Prestige XP: {{ current.xp }} / {{ current.xpToNext }}</p>
+
+    <div class="tiers">
+      <div class="tier" *ngFor="let tier of current.tiers; let i = index">
+        <h4>
+          Tier {{ i + 1 }}
+          <small class="xp-needed">
+            (requires {{ xpRequiredForTier(i) }} XP)
+          </small>
+        </h4>
+        <div class="options">
+          <div
+            class="option"
+            *ngFor="let o of tier"
+            [class.locked]="current.tierIndex <= i"
+            [class.selected]="current.selectedOptions[i] === o.id"
+            (click)="choose(current.id, i, o)"
+          >
+            <strong>{{ o.name }}</strong>
+            <p>{{ o.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="reset-btn" (click)="resetProgress()">Reset Path Progress</button>
+  </div>
+</div>

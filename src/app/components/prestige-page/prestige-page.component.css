@@ -1,0 +1,89 @@
+.prestige-page {
+  padding: 16px;
+  color: #000;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.intro {
+  text-align: center;
+  font-size: 1rem;
+  margin: 0 auto 24px auto;
+  max-width: 600px;
+  line-height: 1.4;
+}
+
+.path-selection {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.path-card {
+  padding: 12px;
+  border: 2px solid #666;
+  border-radius: 4px;
+  width: 180px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.path-card:hover {
+  border-color: #4fc75d;
+  transform: translateY(-2px);
+}
+
+.path-detail {
+  margin-top: 16px;
+}
+
+.back-btn,
+.reset-btn {
+  margin: 8px 0;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.xp-display {
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tier h4 {
+  margin-bottom: 4px;
+}
+
+.options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.option {
+  padding: 8px;
+  border: 2px solid #666;
+  border-radius: 4px;
+  width: 140px;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.option.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.option.selected {
+  border-color: #007BFF;
+  transform: scale(1.05);
+}

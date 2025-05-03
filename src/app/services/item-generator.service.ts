@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Armor, Item, Shield, Weapon} from "../models/item.model";
+import {RelicManagerService} from "./relic-manager.service";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,9 @@ export class ItemGeneratorService {
   offHandTypes = ["Shield", "Offhand Dagger"];
   _itemName: Map<string, string[]> = new Map<string, string[]>();
 
-  constructor() {
+  constructor(
+    private relicService: RelicManagerService
+  ) {
     this._itemName.set("Head", ["Helmet", "Helm"]);
     this._itemName.set("Neck", ["Amulet", "Necklace"]);
     this._itemName.set("Shoulders", ["Pauldrons", "Shoulder-guards"]);
@@ -34,7 +37,8 @@ export class ItemGeneratorService {
 
   generateItem(level: number, rarity?: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" | "Random", slot?: string, avoidWeapon?: boolean, minRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): Item {
     if (!rarity || rarity === "Random") {
-      rarity = this.getRandomRarity(minRarity); // uses Common as fallback min
+      rarity = this.getRandomRarity(minRarity, this.relicService.totalRareDropBonus * 100); // uses Common as fallback min
+      // e.g. at lvl100 → 0.0005*100*100 = 5 → +5% Rare drop chance
     }
 
     let item: Item;
@@ -77,22 +81,61 @@ export class ItemGeneratorService {
     }
   }
 
-  private getRandomRarity(minRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" {
-    const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"] as const;
-    const minIndex = rarityOrder.indexOf(minRarity);
-    const roll = this._getRandomInt(100);
+  private getRandomRarity(
+    minRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common",
+    rareBonusPct: number = 0   // e.g. 5 for +5% Rare from relic
+  ): "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" {
+    // 1) base % chances (sum to 100)
+    const base = {
+      Common:  51,
+      Uncommon:25,
+      Rare:    14,
+      Epic:     7,
+      Legendary:2,
+      Mythic:   1
+    };
 
-    let rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic";
-    if (roll === 99) rarity = 'Mythic';
-    else if (roll > 96) rarity = "Legendary";
-    else if (roll > 89) rarity = "Epic";
-    else if (roll > 75) rarity = "Rare";
-    else if (roll > 50) rarity = "Uncommon";
-    else rarity = "Common";
+    // 2) adjust Rare & Common
+    const adjRare   = base.Rare   + rareBonusPct;
+    const adjCommon = Math.max(0, base.Common - rareBonusPct);
 
-    const rolledIndex = rarityOrder.indexOf(rarity);
-    return rarityOrder[Math.max(rolledIndex, minIndex)];
+    // 3) rebuild cumulative ranges
+    const order: Array<keyof typeof base> = ["Common","Uncommon","Rare","Epic","Legendary","Mythic"];
+    const probs = {
+      Common:  adjCommon,
+      Uncommon:base.Uncommon,
+      Rare:    adjRare,
+      Epic:    base.Epic,
+      Legendary:base.Legendary,
+      Mythic:  base.Mythic
+    };
+
+    // ensure total is 100 (tiny floating‐point fix)
+    const total = Object.values(probs).reduce((a,b) => a+b, 0);
+    if (total !== 100) {
+      // scale down/up proportionally
+      const scale = 100 / total;
+      order.forEach(r => (probs[r] = probs[r] * scale));
+    }
+
+    // 4) roll
+    const roll = Math.random() * 100;
+    let cumulative = 0;
+    let rolled: keyof typeof base = "Common";
+    for (const key of order) {
+      cumulative += probs[key];
+      if (roll < cumulative) {
+        rolled = key;
+        break;
+      }
+    }
+
+    // 5) respect minRarity floor
+    const minIndex    = order.indexOf(minRarity);
+    const rolledIndex = order.indexOf(rolled);
+    return order[Math.max(minIndex, rolledIndex)];
   }
+
 
   upgradeWeapon(weapon: Weapon, newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic"): Weapon {
     // const originalDps = (weapon.minDamage + weapon.maxDamage) / weapon.attackSpeed;

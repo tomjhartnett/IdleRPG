@@ -97,6 +97,7 @@ export class Player extends Entity {
     new Skill("Evasive Maneuvers", "evasive_maneuvers", 1, "Dance gracefully on the battlefield, evading enemy attacks with nimble footwork and quick reflexes.", false)
   ];
   bestiaryBonuses: Partial<Record<MonsterBonus["stat"], { flat: number; percent: number }>> = {};
+  relicBonuses:    Partial<Record<MonsterBonus["stat"], { flat: number; percent: number }>> = {};
 
   get xpToNextLevel() {
     return Math.round(10 * Math.pow(this.level, 1.4));
@@ -174,10 +175,13 @@ export class Player extends Entity {
   }
 
   getBonus(stat: MonsterBonus["stat"]) {
-    const bonus = this.bestiaryBonuses?.[stat];
+    // 1) bestiary
+    const b = this.bestiaryBonuses?.[stat] ?? { flat: 0, percent: 0 };
+    // 2) relics
+    const r = this.relicBonuses?.[stat]    ?? { flat: 0, percent: 0 };
     return {
-      flat: bonus?.flat ?? 0,
-      percent: bonus?.percent ?? 0
+      flat:    b.flat    + r.flat,
+      percent: b.percent + r.percent
     };
   }
 

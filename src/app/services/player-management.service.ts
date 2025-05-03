@@ -4,6 +4,8 @@ import {MONSTER_AFFIX_BONUSES, MonsterBonus, Player} from "../models/entity.mode
 import {InventorySet} from "../models/inventory-set.model";
 import {ItemGeneratorService} from "./item-generator.service";
 import {Skill} from "../models/skill.model";
+import {Subject, take} from "rxjs";
+import {Relic, RelicManagerService} from "./relic-manager.service";
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +17,14 @@ export class PlayerManagementService {
   _hoverSkill!: Skill;
   bestiary: Record<string, number> = {};  // key = suffix, value = count
   gold = 0;
+  smithingUnlocked = false;
+  relicsUnlocked   = false;
+  prestigeUnlocked   = false;
 
   player: Player;
+
+  private unlockSubject = new Subject<'smithing'|'relics'|'prestige'>();
+  public  unlock$      = this.unlockSubject.asObservable();
 
   get lastReplacedItem(): Item | undefined {
     return this.playerSet.lastEquipedItem;
@@ -48,11 +56,37 @@ export class PlayerManagementService {
   }
 
   constructor(
-    private itemGeneratorService: ItemGeneratorService
+    private itemGeneratorService: ItemGeneratorService,
+    private relicService: RelicManagerService
   ) {
     let items: Item[] = [];
     items.push(itemGeneratorService.generateItem(3, "Epic", "Main Hand"));
     this.player = new Player(new InventorySet(items));
+
+    // Whenever you change equip or a relic ascends, recompute relicBonuses
+    this.relicService.getEquipped()
+      .subscribe(() => this.updatePlayerRelicBonuses());
+
+    this.relicService.ascended$
+      .subscribe(() => this.updatePlayerRelicBonuses());
+  }
+
+  /** Call this anytime player.level might have increased */
+  public checkUnlocks(): void {
+    const lvl = this.player.level;
+
+    if (!this.smithingUnlocked && lvl >= 10) {
+      this.smithingUnlocked = true;
+      this.unlockSubject.next('smithing');
+    }
+    if (!this.relicsUnlocked && lvl >= 20) {
+      this.relicsUnlocked = true;
+      this.unlockSubject.next('relics');
+    }
+    if (!this.prestigeUnlocked && lvl >= 50) {
+      this.prestigeUnlocked = true;
+      this.unlockSubject.next('prestige');
+    }
   }
 
   addSkillPoint() {
@@ -77,12 +111,18 @@ export class PlayerManagementService {
       } else if(oldRarity == "Uncommon") {
         newRarity = "Rare";
       }
-      this.player = new Player(new InventorySet([this.itemGeneratorService.upgradeWeapon(oldWeapon as Weapon, newRarity)]));
+
+      // compute how many bonus levels to start at:
+      const phoenixLevels = this.relicService.totalRebirthBonus;
+      const bonusRebirthLevels = Math.floor(phoenixLevels / 5);
+      const startLevel = 1 + bonusRebirthLevels;
+
+      this.player = new Player(new InventorySet([this.itemGeneratorService.upgradeWeapon(oldWeapon as Weapon, newRarity)]), startLevel);
     }
   }
 
   registerMonsterKill(monsterName: string, monsterLevel: number): void {
-    this.gold++;
+    this.addGold(1);
 
     if (monsterLevel <= this.bestiaryKillCount) return;
 
@@ -98,6 +138,12 @@ export class PlayerManagementService {
 
     this.bestiary[suffixMatch]++;
     this.player.applyBonuses(this.getAllBestiaryBonuses());
+  }
+
+  addGold(amount?: number) {
+    const bonusPct = this.relicService.totalGoldBonus; // e.g. 0.0005 * level
+    const finalAmt = Math.round((amount ?? 1) * (1 + bonusPct));
+    this.gold += finalAmt;
   }
 
   getBonusForStat(stat: MonsterBonus["stat"]): { flat: number; percent: number } {
@@ -124,6 +170,80 @@ export class PlayerManagementService {
     }
 
     return bonuses;
+  }
+
+  private updatePlayerRelicBonuses() {
+    const player = this.player;
+    // reset
+    player.relicBonuses = {};
+
+    // for each ascended relic, accumulate its effect
+    this.relicService.getRelics().pipe(take(1)).subscribe(all => {
+      const equipId = this.relicService.getEquippedSync();
+      const actives = all.filter(r => r.ascended || r.id === equipId);
+
+      actives.forEach(r => this.applyRelicBonus(player, r));
+    });
+  }
+
+  /** Map each relic → stat or other bonus */
+  private applyRelicBonus(player: Player, r: Relic) {
+    const lvl = r.level;
+
+    switch (r.id) {
+      case 'r1': // Totem of Precision: +0.10% Crit Chance per level
+        this.accumulate(player.relicBonuses, 'Crit',  0, 0.001 * lvl);
+        break;
+
+      case 'r2': // Idol of Fortitude: +0.10% Armor per level
+        this.accumulate(player.relicBonuses, 'Armor', 0, 0.001 * lvl);
+        break;
+
+      case 'r3': // Sunstone Relic: +0.5 Strength per level
+        this.accumulate(player.relicBonuses, 'Strength', 0.5 * lvl, 0);
+        break;
+
+      case 'r4': // Moonlace Charm: +0.10% Dodge per level
+        this.accumulate(player.relicBonuses, 'Dodge', 0, 0.001 * lvl);
+        break;
+
+      case 'r12': // Vial of Vitality: +0.50% Max HP per level → translates to Stamina bonus
+        this.accumulate(player.relicBonuses, 'Stamina', 0, 0.005 * lvl);
+        break;
+
+      case 'r13': // Shard of Shielding: +0.10% DR per level → treat as Armor bonus
+        this.accumulate(player.relicBonuses, 'Armor', 0, 0.001 * lvl);
+        break;
+
+      case 'r14': // Seal of Essence: +0.5 Spirit per level
+        this.accumulate(player.relicBonuses, 'Spirit', 0.5 * lvl, 0);
+        break;
+
+      case 'r15': // Banner of Titans: +0.10% Stamina per level
+        this.accumulate(player.relicBonuses, 'Stamina', 0, 0.001 * lvl);
+        break;
+
+      case 'r20': // Keystone of Mastery: +0.10% DPS per level → treat as Strength percent
+        this.accumulate(player.relicBonuses, 'Strength', 0, 0.001 * lvl);
+        break;
+
+      // Non‐stat relics (r5, r8, r9, r10, r11, r16) you can handle elsewhere,
+      // e.g. store goldBonus, expBonus, startLevelBonus, critDmgBonus, atkSpeedBonus, dropRateBonus...
+    }
+  }
+
+    /** Helper to accumulate into a bonuses map */
+  private accumulate(
+    map: Partial<Record<string, {flat:number,percent:number}>>,
+    key: string,
+    flat: number,
+    percent: number
+  ) {
+    const prev = map[key] || {flat:0,percent:0};
+    map[key] = {
+      flat:    prev.flat    + flat,
+      percent: prev.percent + percent
+    };
   }
 
   undoEquip() {

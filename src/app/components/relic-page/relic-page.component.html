@@ -1,0 +1,29 @@
+<div class="relic-page">
+  <h1 class="page-title">Relics</h1>
+  <p class="description">
+    Equip one Relic at a time to gain its unique passive bonus.
+    As you fight, your equipped Relic earns XP and levels up—at Level 50 it <strong>ascends</strong>, becomes permanently active,
+    and frees your slot so you can start powering up another.
+    Watch the Relics icon flash when you unlock a new slot!
+  </p>
+
+  <div class="relic-list">
+    <div
+      *ngFor="let relic of relics"
+      class="relic-card"
+      [class.equipped]="relic.id === equippedId"
+      [class.ascended]="relic.ascended"
+      (click)="onEquip(relic)"
+    >
+      <div class="name">{{ relic.name }}</div>
+      <div class="level">Lvl {{ relic.level }}</div>
+      <div class="xp">{{ relic.xp }} / {{ relic.xpToNext }} XP</div>
+      <div class="effect">
+        {{ (relic.level * relic.perLevel) | number:'1.0-2' }} {{ relic.effectLabel }}
+      </div>
+      <div class="per-level">
+        (+{{ relic.perLevel }} {{ relic.effectLabel }} per lvl)
+      </div>
+    </div>
+  </div>
+</div>

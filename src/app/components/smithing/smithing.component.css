@@ -1,12 +1,22 @@
 .smithing-page {
   padding: 20px;
   text-align: center;
+  color: #000;  /* default black text */
 }
 
-.smithing-title {
-  font-size: 24px;
-  margin-bottom: 10px;
+.page-title {
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
+
+.description {
+  font-size: 1rem;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* keep your existing styles below */
+.smithing-title { /* no longer used, you can remove this */ }
 
 .gold-count {
   margin-bottom: 20px;

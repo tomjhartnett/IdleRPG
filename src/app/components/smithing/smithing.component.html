@@ -1,5 +1,12 @@
 <div class="smithing-page">
-  <h2 class="smithing-title">Smithing Upgrades</h2>
+  <h1 class="page-title">Smithing Upgrades</h1>
+  <p class="description">
+    Spend the Gold you earn from defeating monsters to reinforce your gear!
+    Each reinforcement level boosts all of that item’s stats by 10%.
+    Select an item below to preview its next upgrade, see the Gold cost,
+    and get an instant breakdown of DPS &amp; EHP gains.
+  </p>
+
   <div class="gold-count">Gold (from kills): {{ gold.toFixed(0) }}</div>
 
   <div class="smithing-grid">
@@ -20,7 +27,8 @@
   <div *ngIf="selectedItem" class="smithing-details">
     <h3>Upgrade Preview</h3>
     <div class="upgrade-cost">
-      Upgrade to +{{ selectedItem.reinforceLevel + 1 }} (Cost: {{ getUpgradeCost(selectedItem).toFixed(0) }} Gold)
+      Upgrade to +{{ selectedItem.reinforceLevel + 1 }}
+      (Cost: {{ getUpgradeCost(selectedItem).toFixed(0) }} Gold)
     </div>
 
     <div class="stat-preview" *ngFor="let stat of getBoostedStats(selectedItem)">
@@ -29,7 +37,11 @@
     <div *ngIf="getDpsIncrease(selectedItem) > 0">+{{ getDpsIncrease(selectedItem) }} DPS</div>
     <div *ngIf="getEhpIncrease(selectedItem) > 0">+{{ getEhpIncrease(selectedItem) }} EHP</div>
 
-    <button class="upgrade-btn" [disabled]="gold < getUpgradeCost(selectedItem)" (click)="upgradeSelectedItem()">
+    <button
+      class="upgrade-btn"
+      [disabled]="gold < getUpgradeCost(selectedItem)"
+      (click)="upgradeSelectedItem()"
+    >
       Upgrade Item
     </button>
   </div>

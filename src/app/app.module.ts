@@ -16,6 +16,8 @@ import {HeaderComponent} from "./components/header/header.component";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from "@angular/material/icon";
 import {SmithingComponent} from "./components/smithing/smithing.component";
+import {RelicPageComponent} from "./components/relic-page/relic-page.component";
+import {PrestigePageComponent} from "./components/prestige-page/prestige-page.component";
 
 @NgModule({
   declarations: [
@@ -31,7 +33,9 @@ import {SmithingComponent} from "./components/smithing/smithing.component";
     SkillTooltipComponent,
     PlayerBestiaryComponent,
     HeaderComponent,
-    SmithingComponent
+    SmithingComponent,
+    RelicPageComponent,
+    PrestigePageComponent
   ],
   imports: [
     BrowserModule,
