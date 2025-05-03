@@ -11,6 +11,7 @@ import {ItemFilterService} from "./item-filter.service";
 export class CombatManagerService {
   is_testing_mode = false;
 
+  showPercents = false;
   isPaused = false;
   _currentMonster: Monster = new Monster(1, "Common");
   _currentMonsterWeapon: Weapon = this.itemGeneratorService.generateItem(1, "Common", "Main Hand") as Weapon;
@@ -139,8 +140,9 @@ export class CombatManagerService {
     const monsterDmgPercent = monsterHpLost / this._currentMonster.maxHp;
     const playerDmgPercent = playerHpLost / this.playerManagementService.player.maxHp;
 
-    this.lastMonsterHpRatio = (this.lastMonsterHpRatio + (monsterDmgPercent / Math.max(playerDmgPercent, 0.01))) / 2; // prevent divide-by-0
-    console.log('scaling', this.lastMonsterHpRatio)
+    const rawRatio = monsterDmgPercent / Math.max(playerDmgPercent, 0.01);
+    console.log('scaling', rawRatio)
+    this.lastMonsterHpRatio = Math.min(2, Math.max(0.5, (this.lastMonsterHpRatio + rawRatio) / 2));
 
     this.combatEnded = true;
     this.currentCombat = undefined;
@@ -173,7 +175,7 @@ export class CombatManagerService {
 
     player.addExp(Math.round(this._currentMonster.xpAwarded * (2 - Math.min(1, this.lastMonsterHpRatio))));
 
-    const mainHand = player.inventorySet.slots.get('Main Hand')!;
+    const mainHand = player.inventorySet.slots.get('Main Hand')! as Weapon;
     const slot = mainHand.level * 3 < player.level ? 'Main Hand' : undefined;
     const avoidWeapon = mainHand.level >= player.level;
     const minDropRarity = this.itemGeneratorService.getMinDropRarity(this._currentMonster.rarity);
@@ -191,9 +193,27 @@ export class CombatManagerService {
       const autoEquipEnabled = this.itemFilterService.isAutoEquiping;
       const isUpgrade = !oldItem || oldItem.lastUpdatedWeight <= this._rewardItem.lastUpdatedWeight;
 
-      if ((isMainHand && isUpgrade) || !autoEquipEnabled) {
+      if ((isMainHand && this._rewardItem instanceof Weapon && this._rewardItem.DPS > (parseFloat(mainHand.DPS) / 2).toFixed(0)) || !autoEquipEnabled) {
         // Pause — manual review required
-        console.log("Combat paused: manual review required for", this._rewardItem.name);
+        if(!this.is_testing_mode) {
+          console.log("Combat paused: manual review required for", this._rewardItem.name);
+        } else {
+          if (this._rewardItem instanceof Weapon && this._rewardItem.DPS > (parseFloat(mainHand.DPS) * 2).toFixed(0)) {
+            // Auto-equip & continue
+            this.autoEquipRewardName = this._rewardItem.name;
+            if (this._rewardItem?.name === this.autoEquipRewardName) {
+              player.inventorySet.addItem(this._rewardItem!);
+            }
+            if (this.playerManagementService.canUpgradeWeapon && this.is_testing_mode) {
+              this.playerManagementService.upgradeWeapon();
+              this.generateMonster();
+            } else {
+              this.generateMonster();
+            }
+          } else {
+            this.generateMonster();
+          }
+        }
       } else if (isUpgrade) {
         // Auto-equip & continue
         this.autoEquipRewardName = this._rewardItem.name;

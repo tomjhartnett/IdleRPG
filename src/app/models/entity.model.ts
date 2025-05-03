@@ -17,7 +17,7 @@ export abstract class Entity {
   abstract get totalArmor(): number;
 
   get maxHp(): number {
-    return Math.round((this.level * 10) + (this.stamina * 3));
+    return Math.round((this.level * 30) + (this.stamina * 3));
   }
 
   get percentDmgUp(): number {
@@ -29,23 +29,33 @@ export abstract class Entity {
   }
 
   get critChance(): number {
-    const critScore = (this.agility + this.intellect)/2;
-    const scalingFactor = 300 + (this.level * 10);  // Increase cost with level
-    return 100 * (critScore / (critScore + scalingFactor));
+    const baseCritScore = (this.agility + this.intellect)/2;
+    const scaling = 1000 + (this.level * 40);
+
+    return 100 * (baseCritScore / (baseCritScore + scaling));
   }
 
   get dodgeChance(): number {
-    const agiScore = this.agility;
-    const scalingFactor = 400 + (this.level * 10);  // Increase the "diminishing" rate with level
-    return 100 * (agiScore / (agiScore + scalingFactor));
+    const baseDodgeScore = this.agility;
+    const scaling = 1000 + (this.level * 40);
+
+    return 100 * (baseDodgeScore / (baseDodgeScore + scaling));
+  }
+
+  get DR(): number {
+    return Math.min(0.9, this.totalArmor / (this.totalArmor + 5000 + (100 * this.level)));
   }
 
   get avgDR(): string {
     return (100 * this.DR).toFixed(2);
   }
 
-  get DR(): number {
-    return Math.min(0.9, this.totalArmor / (this.totalArmor + 400 + (20 * this.level)));
+  get EHP(): number {
+    const dodge = Math.min(this.dodgeChance / 100, 0.99); // Cap at 99% dodge
+    const dr = Math.min(this.DR, 0.9); // Already capped in DR formula
+
+    const effectiveHitRate = (1 - dodge) * (1 - dr);
+    return Math.round(this.maxHp / Math.max(effectiveHitRate, 0.01)); // avoid divide-by-0
   }
 
   protected constructor(level: number) {
@@ -150,18 +160,6 @@ export class Player extends Entity {
     const scaling = 1000 + (this.level * 40);
 
     return 100 * (boostedScore / (boostedScore + scaling));
-  }
-
-  override get DR(): number {
-    return Math.min(0.9, this.totalArmor / (this.totalArmor + 5000 + (100 * this.level)));
-  }
-
-  get EHP(): number {
-    const dodge = Math.min(this.dodgeChance / 100, 0.99); // Cap at 99% dodge
-    const dr = Math.min(this.DR, 0.9); // Already capped in DR formula
-
-    const effectiveHitRate = (1 - dodge) * (1 - dr);
-    return Math.round(this.maxHp / Math.max(effectiveHitRate, 0.01)); // avoid divide-by-0
   }
 
   constructor(inventorySet: InventorySet, level: number = 1) {
@@ -272,7 +270,7 @@ export class Monster extends Entity {
     const base = level * this.getRarityScalar(rarity);
 
     // Ratio: monster damage percent / player damage percent
-    const fightMultiplier  = Math.min(3, lastFightHpRatio ?? 1);  // Max 3x scaling, default 1x
+    const fightMultiplier  = Math.min(2, lastFightHpRatio ?? 1);  // Max 2x scaling, default 1x
     const scalingMultiplier = 1 + Math.pow(totalKills / 500, 1.01); // exponential scale
 
     const difficultyMultiplier = fightMultiplier * scalingMultiplier;
@@ -281,7 +279,7 @@ export class Monster extends Entity {
     this.agility   = Math.round(base * difficultyMultiplier);
     this.intellect = Math.round(base * difficultyMultiplier);
     this.spirit    = Math.round(base * difficultyMultiplier);
-    this.stamina   = Math.round(base * 2 * difficultyMultiplier); // affects HP
+    this.stamina   = Math.round(base * 3 * difficultyMultiplier); // affects HP
 
     this.name = this.generateName();
     this.image = `monster_` + (this.getRandomInt(this.MAX_MONSTER_IMAGES) + 1);

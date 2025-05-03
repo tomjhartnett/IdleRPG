@@ -24,3 +24,9 @@
   display: flex;
   justify-content: space-between;
 }
+
+.stat-roll {
+  font-size: 0.9em;
+  color: #ccc;
+  margin-left: 4px;
+}

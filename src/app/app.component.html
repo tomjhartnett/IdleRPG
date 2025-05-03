@@ -1,12 +1,12 @@
 <app-header (pageChange)="changePage($event)"></app-header>
 <div class="columns">
-  <div class="thirds">
+  <div class="inventory">
     <div class="columns">
       <app-player-stats></app-player-stats>
       <app-inventory></app-inventory>
 <!--      <app-skills></app-skills>-->
     </div>
-    <app-tooltip class="left" *ngIf="showTooltip" [item]="hoverItem"></app-tooltip>
+    <app-tooltip [showPercents]="showPercents" class="left" *ngIf="showTooltip" [item]="hoverItem"></app-tooltip>
 <!--    <app-skill-tooltip class="left" *ngIf="showSkillTooltip" [skill]="hoverSkill"></app-skill-tooltip>-->
   </div>
   <div class="rest">

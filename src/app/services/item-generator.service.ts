@@ -47,19 +47,19 @@ export class ItemGeneratorService {
     if (slot == "Main Hand") {
       const type = this.mainHandTypes[this._getRandomInt(this.mainHandTypes.length)];
       const weaponStats = this.getWeaponStats(level, rarity);
-      item = new Weapon(this.getRandomName(type), slot, this.getRandomImage(type), weaponStats.minDamage, weaponStats.maxDamage, weaponStats.attackSpeed, type, level, weaponStats.stats, rarity);
+      item = new Weapon(this.getRandomName(type), slot, this.getRandomImage(type), weaponStats.minDamage, weaponStats.maxDamage, weaponStats.attackSpeed, weaponStats.maxMinDamage, weaponStats.maxMaxDamage, weaponStats.maxAttackSpeed, type, level, weaponStats.stats, weaponStats.maxStats, rarity);
     } else if (slot == "Off Hand") {
       const type = this.offHandTypes[this._getRandomInt(this.offHandTypes.length)];
       if (type == 'Offhand Dagger') {
         const weaponStats = this.getWeaponStats(level, rarity);
-        item = new Weapon(this.getRandomName(type, weaponStats.stats, rarity), slot, this.getRandomImage('Dagger'), weaponStats.minDamage, weaponStats.maxDamage, weaponStats.attackSpeed, type, level, weaponStats.stats, rarity);
+        item = new Weapon(this.getRandomName(type, weaponStats.stats, rarity), slot, this.getRandomImage('Dagger'), weaponStats.minDamage, weaponStats.maxDamage, weaponStats.attackSpeed, weaponStats.maxMinDamage, weaponStats.maxMaxDamage, weaponStats.maxAttackSpeed, type, level, weaponStats.stats, weaponStats.maxStats, rarity);
       } else if (type == 'Shield') {
         const armorStats = this.getShieldStats(level, rarity);
-        item = new Shield(this.getRandomName(type), slot, this.getRandomImage(type), armorStats.armor, level, armorStats.stats, rarity);
+        item = new Shield(this.getRandomName(type), slot, this.getRandomImage(type), armorStats.armor, armorStats.maxArmor, level, armorStats.stats, armorStats.maxStats, rarity);
       }
     } else {
       const armorStats = this.getArmorStats(level, rarity);
-      item = new Armor(this.getRandomName(slot), slot, this.getRandomImage(slot), armorStats.armor, armorStats.armorType, level, armorStats.stats, rarity);
+      item = new Armor(this.getRandomName(slot), slot, this.getRandomImage(slot), armorStats.armor, armorStats.maxArmor, armorStats.armorType, level, armorStats.stats, armorStats.maxStats, rarity);
     }
 
     return item!;
@@ -95,89 +95,171 @@ export class ItemGeneratorService {
   }
 
   upgradeWeapon(weapon: Weapon, newRarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic"): Weapon {
-    weapon._minDamage = Math.round(weapon.level * (1 + (this.getRaritySkewPercent(newRarity) / 100)));
-    weapon._maxDamage = Math.round(weapon.level * 1.5 * (1 + (2 * (this.getRaritySkewPercent(newRarity) / 100))));
-    weapon.stats = this.getRandomStats(weapon.level, newRarity);
+    // const originalDps = (weapon.minDamage + weapon.maxDamage) / weapon.attackSpeed;
+
+    let bestDps = 0;
+    let bestRoll!: {minDamage: number, maxDamage: number, attackSpeed: number, stats: { stat: string, amount: number }[], maxMinDamage: number, maxMaxDamage: number, maxAttackSpeed: number, maxStats: { stat: string, amount: number }[] };
+
+    // Try up to 10 times to roll better DPS
+    for (let i = 0; i < 10; i++) {
+      const roll = this.getWeaponStats(weapon.level, newRarity, weapon.stats.map(s => ({ stat: s.stat })));
+      const newDps = (roll.minDamage + roll.maxDamage) / roll.attackSpeed;
+
+      if (newDps > bestDps) {
+        bestDps = newDps;
+        bestRoll = roll;
+      }
+    }
+
+    // Apply the new, stronger stats
+    weapon._minDamage = bestRoll.minDamage;
+    weapon._maxDamage = bestRoll.maxDamage;
+    weapon._attackSpeed = bestRoll.attackSpeed;
+    weapon._maxMinDamage = bestRoll.maxMinDamage;
+    weapon._maxMaxDamage = bestRoll.maxMaxDamage;
+    weapon._maxAttackSpeed = bestRoll.maxAttackSpeed;
+    weapon.stats = bestRoll.stats;
+    weapon.maxStats = bestRoll.maxStats;
     weapon.rarity = newRarity;
+
     return weapon;
   }
 
-  getWeaponStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic", type?: string): {
+  getStatCountForRarity(rarity: string): number {
+    switch (rarity) {
+      case "Mythic": return 5;
+      case "Legendary": return 4;
+      case "Epic": return 3;
+      case "Rare": return 2;
+      case "Uncommon": return 1;
+      default: return 0;
+    }
+  }
+
+  getWeaponStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic", minStats: { stat: string }[] = []): {
     minDamage: number;
     maxDamage: number;
     attackSpeed: number;
     stats: { stat: string, amount: number }[];
+    maxMinDamage: number;
+    maxMaxDamage: number;
+    maxAttackSpeed: number;
+    maxStats: { stat: string, amount: number }[];
   } {
-    const statBias = this.getStatBiasForWeapon(type);
+    const skew = this.getRaritySkewPercent(rarity);
 
-    return {
-      minDamage: Math.round(2 * level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity) / 2) + this.getRaritySkewPercent(rarity)) / 100))),
-      maxDamage: Math.round(2 * level * 1.5 * (1 + (2 * (this._getRandomInt(this.getRaritySkewPercent(rarity) / 2) + this.getRaritySkewPercent(rarity)) / 100))),
-      attackSpeed: 1.5 - (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100),
-      stats: this.getRandomStats(level, rarity, statBias)
-    };
-  }
+    const roll = this._getRandomInt(skew);
+    const reduction = (roll / skew) * 0.7;
+    const attackSpeed = Math.max(0.8, 1.5 - reduction);
 
-  getStatBiasForWeapon(type?: string): string[] {
-    switch (type) {
-      case "Sword": return ["Strength", "Agility"];
-      case "Mace": return ["Intellect", "Spirit"];
-      case "Dagger": return ["Agility"];
-      default: return [];
+    const minDamage = Math.round(2 * level * (1 + ((this._getRandomInt(skew / 2) + skew) / 100)));
+    const maxDamage = Math.round(2 * level * 1.5 * (1 + (2 * (this._getRandomInt(skew / 2) + skew) / 100)));
+
+    // Ensure we include minStats first, then fill up to rarity limit
+    const totalStatsNeeded = this.getStatCountForRarity(rarity);
+    const statNames = ["Strength", "Stamina", "Agility", "Intellect", "Spirit"];
+    const picked = new Set<string>();
+    const stats: { stat: string, amount: number }[] = [];
+    const maxStats: { stat: string, amount: number }[] = [];
+
+    for (const s of minStats) {
+      picked.add(s.stat);
+      const amount = Math.round(level * (1 + this._getRandomInt(skew) / 100));
+      const maxAmount = Math.round(level * (1 + skew / 100));
+      stats.push({ stat: s.stat, amount });
+      maxStats.push({ stat: s.stat, amount: maxAmount });
     }
-  }
 
-  getShieldStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): {armor: number, stats: {stat: string, amount: number}[]} {
+    const remainingStats = statNames.filter(s => !picked.has(s));
+    while (stats.length < totalStatsNeeded && remainingStats.length > 0) {
+      const stat = remainingStats.splice(this._getRandomInt(remainingStats.length), 1)[0];
+      const amount = Math.round(level * (1 + this._getRandomInt(skew) / 100));
+      const maxAmount = Math.round(level * (1 + skew / 100));
+      stats.push({ stat, amount });
+      maxStats.push({ stat, amount: maxAmount });
+    }
+
     return {
-      armor: Math.round(level * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
-      stats: this.getRandomStats(level, rarity)
+      minDamage,
+      maxDamage,
+      attackSpeed,
+      stats,
+      maxMinDamage: Math.round(2 * level * (1 + (1.5 * skew) / 100)),
+      maxMaxDamage: Math.round(2 * level * 1.5 * (1 + (3.0 * skew) / 100)),
+      maxAttackSpeed: 0.8,
+      maxStats
     };
   }
 
-  getArmorStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): {armor: number, armorType: "Cloth" | "Leather" | "Plate", stats: {stat: string, amount: number}[]} {
+  getShieldStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): {
+    armor: number;
+    stats: { stat: string, amount: number }[];
+    maxArmor: number;
+    maxStats: { stat: string, amount: number }[];
+  } {
+    const skew = this.getRaritySkewPercent(rarity);
+    const armor = Math.round(level * (1 + ((this._getRandomInt(skew / 2) + skew) / 100)));
+    const {stats, maxStats} = this.getRandomStats(level, rarity);
+
     return {
-      armor: Math.round(level * 2 * (1 + ((this._getRandomInt(this.getRaritySkewPercent(rarity)/2) + this.getRaritySkewPercent(rarity)) / 100))),
+      armor,
+      stats,
+      maxArmor: Math.round(level * 2 * (1 + (1.5 * skew) / 100)),
+      maxStats
+    };
+  }
+
+  getArmorStats(level: number, rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic" = "Common"): {
+    armor: number;
+    armorType: "Cloth" | "Leather" | "Plate";
+    stats: { stat: string, amount: number }[];
+    maxArmor: number;
+    maxStats: { stat: string, amount: number }[];
+  } {
+    const skew = this.getRaritySkewPercent(rarity);
+    const armor = Math.round(level * 2 * (1 + ((this._getRandomInt(skew / 2) + skew) / 100)));
+    const {stats, maxStats} = this.getRandomStats(level, rarity);
+
+    return {
+      armor,
       armorType: this.getRandomArmorType(),
-      stats: this.getRandomStats(level, rarity)
+      stats,
+      maxArmor: Math.round(level * 2 * (1 + (1.5 * skew) / 100)),
+      maxStats
     };
   }
+
 
   getRandomStats(
     level: number,
-    rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic",
-    preferredStats: string[] = []
-  ): {stat: string, amount: number}[] {
+    rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Mythic"
+  ): { stats: {stat: string, amount: number}[], maxStats: {stat: string, amount: number}[] } {
     const statNames = ["Strength", "Stamina", "Agility", "Intellect", "Spirit"];
-    let draws = 0;
-    switch (rarity) {
-      case "Mythic": draws = 5; break;
-      case "Legendary": draws = 4; break;
-      case "Epic": draws = 3; break;
-      case "Rare": draws = 2; break;
-      case "Uncommon": draws = 1; break;
-      default: break;
-    }
-
+    const draws = this.getStatCountForRarity(rarity);
     const pickedStats: string[] = [];
 
-    while (draws > 0) {
-      // 70% chance to prefer a biased stat if given
-      const usePreferred = preferredStats.length && Math.random() < 0.7;
-      const pool = usePreferred ? preferredStats : statNames;
-
-      const statName = pool[this._getRandomInt(pool.length)];
+    while (pickedStats.length < draws) {
+      const statName = statNames[this._getRandomInt(statNames.length)];
       if (!pickedStats.includes(statName)) {
         pickedStats.push(statName);
-        draws--;
       }
     }
 
-    return statNames
-      .filter(stat => pickedStats.includes(stat))
-      .map(stat => ({
+    const skew = this.getRaritySkewPercent(rarity);
+    const stats = pickedStats.map(stat => {
+      const roll = this._getRandomInt(skew);
+      return {
         stat,
-        amount: Math.round(level * (1 + (this._getRandomInt(this.getRaritySkewPercent(rarity)) / 100)))
-      }));
+        amount: Math.round(level * (1 + roll / 100))
+      };
+    });
+
+    const maxStats = pickedStats.map(stat => ({
+      stat,
+      amount: Math.round(level * (1 + skew / 100))
+    }));
+
+    return { stats, maxStats };
   }
 
 
@@ -197,8 +279,8 @@ export class ItemGeneratorService {
       case "Rare": return 25;
       case "Epic": return 40;
       case "Legendary": return 60;
-      case "Mythic": return 90;
-      default: return 10;
+      case "Mythic": return 85;
+      default: return 5;
     }
   }
 

@@ -10,6 +10,9 @@ import {ItemFilterService} from "../../services/item-filter.service";
 export class HeaderComponent implements OnInit {
   @Output() pageChange: EventEmitter<string> = new EventEmitter<string>();
   currentPage: string = 'inventory';
+  isShowingPercents(): boolean {
+    return this.combatService.showPercents;
+  }
 
   isTestingMode(): boolean {
     return this.combatService.is_testing_mode;
@@ -33,5 +36,9 @@ export class HeaderComponent implements OnInit {
     this.combatService.is_testing_mode = !this.combatService.is_testing_mode;
     this.itemFilterService.setFiltering(true);
     this.itemFilterService.setAutoEquip(true);
+  }
+
+  toggleTooltipPercents() {
+    this.combatService.showPercents = !this.combatService.showPercents;
   }
 }

@@ -6,6 +6,12 @@
   <div class="right-section">
     <div class="testing-toggle">
       <label>
+        <input type="checkbox" [checked]="!isShowingPercents" (change)="toggleTooltipPercents()" />
+        Show Item Percents?
+      </label>
+    </div>
+    <div class="testing-toggle">
+      <label>
         <input type="checkbox" [checked]="!isTestingMode" (change)="toggleTestingMode()" />
         Testing Mode
       </label>

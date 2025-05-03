@@ -65,12 +65,12 @@
             <button (click)="equip()">Equip</button>
             <button (click)="discardForSkill()">Discard to get skill point</button>
           </div>
-          <app-tooltip [item]="rewardItem"></app-tooltip>
+          <app-tooltip [item]="rewardItem" [showPercents]="showPercents"></app-tooltip>
         </div>
         <div *ngIf="rewardEquivalent">
           Current Item in Slot:
           <app-inventory-slot [item]="rewardEquivalent"></app-inventory-slot>
-          <app-tooltip [item]="rewardEquivalent"></app-tooltip>
+          <app-tooltip [item]="rewardEquivalent" [showPercents]="showPercents"></app-tooltip>
         </div>
       </div>
     </div>

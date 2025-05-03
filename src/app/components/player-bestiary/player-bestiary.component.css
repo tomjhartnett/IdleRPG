@@ -20,7 +20,7 @@
 
 .bestiary-table th:nth-child(2),
 .bestiary-table td:nth-child(2) {
-  width: 20%; /* Stat */
+  width: 25%; /* Stat */
 }
 
 .bestiary-table th:nth-child(3),

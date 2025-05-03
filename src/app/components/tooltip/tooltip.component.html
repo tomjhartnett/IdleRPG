@@ -3,14 +3,26 @@
     {{ item.name }}<span *ngIf="item.reinforceLevel && item.reinforceLevel > 0"> +{{ item.reinforceLevel }}</span>
   </div>
   <div class="tooltip-row item-level-color">Item Level {{itemLevel}}</div>
-  <div *ngFor="let line of item.tooltipLines">
-    <div class="aside-text-container">
-      <div class="tooltip-row" *ngFor="let str of line">{{str}}</div>
+  <div *ngIf="!showPercents">
+    <div *ngFor="let line of item.tooltipLines">
+      <div class="aside-text-container">
+        <div class="tooltip-row" *ngFor="let str of line">{{str}}</div>
+      </div>
     </div>
   </div>
-  <div *ngIf="item.strength > 0" class="tooltip-row">+{{ item.strength }} Strength</div>
-  <div *ngIf="item.stamina > 0" class="tooltip-row">+{{ item.stamina }} Stamina</div>
-  <div *ngIf="item.agility > 0" class="tooltip-row">+{{ item.agility }} Agility</div>
-  <div *ngIf="item.intellect > 0" class="tooltip-row">+{{ item.intellect }} Intellect</div>
-  <div *ngIf="item.spirit > 0" class="tooltip-row">+{{ item.spirit }} Spirit</div>
+  <div *ngIf="showPercents">
+    <div *ngFor="let line of item.altTooltipLines">
+      <div class="aside-text-container">
+        <div class="tooltip-row" *ngFor="let str of line">{{str}}</div>
+      </div>
+    </div>
+  </div>
+  <div *ngFor="let stat of ['Strength', 'Stamina', 'Agility', 'Intellect', 'Spirit']">
+    <div *ngIf="item.getStatValue(stat) > 0" class="tooltip-row">
+      +{{ item.getStatValue(stat) }} {{ stat }}
+      <span *ngIf="showPercents" class="stat-roll">({{ item.getStatPercent(stat) }}%)</span>
+    </div>
+  </div>
+
+  <div class="tooltip-row quality-row">Quality: {{ item.averagePercent }}%</div>
 </div>

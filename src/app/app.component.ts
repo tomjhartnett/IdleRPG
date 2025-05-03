@@ -13,6 +13,10 @@ export class AppComponent {
   title = 'IdleRPG';
   currentPage: string = 'home';
 
+  get showPercents(): boolean {
+    return this.combatManagerService.showPercents;
+  }
+
   get hoverItem(): Item {
     return this.playerManagerService._hoverItem;
   }

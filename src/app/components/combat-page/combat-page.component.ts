@@ -14,7 +14,9 @@ export class CombatPageComponent implements OnInit {
   get combatActive(): boolean {
     return this.combatManagerService.combatActive;
   }
-
+  get showPercents(): boolean {
+    return this.combatManagerService.showPercents;
+  }
   get playerName(): string {
     return this.playerManagementService.player.name;
   }

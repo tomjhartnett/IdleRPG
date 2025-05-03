@@ -9,14 +9,18 @@ import {Item} from "../../models/item.model";
 export class TooltipComponent implements OnInit {
 
   @Input() item!: Item;
+  @Input() showPercents = false;
 
   get itemLevel(): number {
     return this.item ? Math.round(this.item.level): 0;
   }
 
-  constructor() { }
-
-  ngOnInit(): void {
+  get avgPercent(): number {
+    return this.item.averagePercent;
   }
 
+  constructor() { }
+
+  ngOnInit() {
+  }
 }
