@@ -11,9 +11,7 @@ export abstract class Entity {
   abstract intellect: number;
   abstract spirit: number;
   currentHp: number;
-  // name: string;
-  // image: string;
-
+  
   abstract get totalArmor(): number;
 
   get maxHp(): number {
@@ -223,7 +221,7 @@ export class Monster extends Entity {
   ];
 
   private static species = [
-    "Warg", "Spider", "Lich", "Bandit", "Wolf", "Golem", "Beast", "Wraith", "Bat", "Cultist", "Serpent", "Ghoul"
+    "Demon Warg", "Demon Spider", "Demon Lich", "Demon Bandit", "Demon Wolf", "Demon Golem", "Demon Beast", "Demon Wraith", "Demon Bat", "Demon Cultist", "Demon Serpent", "Demon Ghoul"
   ];
 
   get totalArmor(): number {
@@ -338,4 +336,3 @@ export const MONSTER_AFFIX_BONUSES: Record<string, MonsterBonus> = {
   "of Stone":        { stat: "Armor", flat: 3, percent: 0.01 },
   "of Fortitude":    { stat: "Armor", flat: 6, percent: 0.02 }
 };
-
