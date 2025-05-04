@@ -75,11 +75,11 @@ export class PlayerManagementService {
   public checkUnlocks(): void {
     const lvl = this.player.level;
 
-    if (!this.smithingUnlocked && lvl >= 10) {
+    if (!this.smithingUnlocked && lvl >= 5) {
       this.smithingUnlocked = true;
       this.unlockSubject.next('smithing');
     }
-    if (!this.relicsUnlocked && lvl >= 20) {
+    if (!this.relicsUnlocked && lvl >= 10) {
       this.relicsUnlocked = true;
       this.unlockSubject.next('relics');
     }

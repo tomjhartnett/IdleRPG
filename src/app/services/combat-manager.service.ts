@@ -184,7 +184,16 @@ export class CombatManagerService {
       this._currentMonster.level
     );
 
-    const baseExp = Math.round(this._currentMonster.xpAwarded * (2 - Math.min(1, this.lastMonsterHpRatio)));
+    const weapon   = player.inventorySet.slots.get('Main Hand');
+    const wLevel   = Math.max(1, weapon?.level ?? player.level);
+    const mLevel   = this._currentMonster.level;
+
+    // if player’s weapon is weaker than the monster, boost exp by (mLevel/wLevel), capped at 3×
+    const expMultiplier = wLevel < mLevel
+      ? Math.min(3, mLevel / wLevel)
+      : 1;
+
+    const baseExp = Math.round(this._currentMonster.xpAwarded * expMultiplier);
     const relicExpBonus = this.relicService.totalExpBonusPercent;
     const finalExp = Math.round(baseExp * (1 + relicExpBonus));
     player.addExp(finalExp);
@@ -211,12 +220,17 @@ export class CombatManagerService {
       const autoEquipEnabled = this.itemFilterService.isAutoEquiping;
       const isUpgrade = !oldItem || oldItem.lastUpdatedWeight <= this._rewardItem.lastUpdatedWeight;
 
-      if ((isMainHand && this._rewardItem instanceof Weapon && this._rewardItem.DPS > (parseFloat(mainHand.DPS) / 2).toFixed(0)) || !autoEquipEnabled) {
+      if ((isMainHand && this._rewardItem instanceof Weapon && parseFloat(this._rewardItem.DPS) > (parseFloat(mainHand.DPS) / 2)) || !autoEquipEnabled) {
         // Pause — manual review required
         if(!this.is_testing_mode) {
           console.log("Combat paused: manual review required for", this._rewardItem.name);
         } else {
-          if (this._rewardItem instanceof Weapon && this._rewardItem.DPS > (parseFloat(mainHand.DPS) * 2).toFixed(0)) {
+          let ratio = 1.5;
+          const order = ["Common","Uncommon","Rare","Epic","Legendary","Mythic"];
+          if (order.indexOf(this._rewardItem.rarity) < order.indexOf(mainHand.rarity)) {
+            ratio = 1;
+          }
+          if (this._rewardItem instanceof Weapon && parseFloat(this._rewardItem.DPS) > (parseFloat(mainHand.DPS) * ratio)) {
             // Auto-equip & continue
             this.autoEquipRewardName = this._rewardItem.name;
             if (this._rewardItem?.name === this.autoEquipRewardName) {
@@ -312,7 +326,18 @@ export class CombatManagerService {
     }
 
     this._currentMonster = new Monster(level * this.generateOffset(), rarity, this.totalKills, this.lastMonsterHpRatio);
-    this._currentMonsterWeapon = this.itemGeneratorService.generateItem(this._currentMonster.level, "Random", "Main Hand") as Weapon;
+    const minRarityForItem: "Common"|"Uncommon"|"Rare"|"Epic"|"Legendary"|"Mythic" =
+      (this._currentMonster.rarity === "Boss")
+        ? "Mythic"
+        : this._currentMonster.rarity;
+
+    this._currentMonsterWeapon = this.itemGeneratorService.generateItem(
+      this._currentMonster.level,
+      undefined,
+      "Main Hand",
+      false,
+      minRarityForItem
+    ) as Weapon;
 
     this.recentAttacks = [];
     this.playerManagementService.player.currentHp = this.playerManagementService.player.maxHp;

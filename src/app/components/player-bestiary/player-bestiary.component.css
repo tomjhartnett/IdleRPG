@@ -15,7 +15,7 @@
 /* Column widths based on 2-2-1-2 distribution */
 .bestiary-table th:nth-child(1),
 .bestiary-table td:nth-child(1) {
-  width: 35%; /* Affix */
+  width: 30%; /* Affix */
 }
 
 .bestiary-table th:nth-child(2),

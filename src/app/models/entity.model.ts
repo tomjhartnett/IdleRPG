@@ -17,7 +17,7 @@ export abstract class Entity {
   abstract get totalArmor(): number;
 
   get maxHp(): number {
-    return Math.round((this.level * 30) + (this.stamina * 3));
+    return Math.round((this.level * 10) + this.stamina + this.spirit);
   }
 
   get percentDmgUp(): number {
@@ -252,7 +252,7 @@ export class Monster extends Entity {
       case "Uncommon": rarityScale = 2; break;
       default: rarityScale = 1; break;
     }
-    return this.level * rarityScale * 2;
+    return this.level * rarityScale * 5;
   }
 
   getRarityScalar(rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss"): number {
@@ -274,8 +274,8 @@ export class Monster extends Entity {
     const base = level * this.getRarityScalar(rarity);
 
     // Ratio: monster damage percent / player damage percent
-    const fightMultiplier  = Math.min(2, lastFightHpRatio ?? 1);  // Max 2x scaling, default 1x
-    const scalingMultiplier = 1 + Math.pow(totalKills / 500, 1.01); // exponential scale
+    const fightMultiplier  = Math.min(3, lastFightHpRatio ?? 1);  // Max 3x scaling, default 1x
+    const scalingMultiplier = 1 + Math.pow(totalKills / 300, 1.01); // exponential scale
 
     const difficultyMultiplier = fightMultiplier * scalingMultiplier;
 
@@ -283,7 +283,7 @@ export class Monster extends Entity {
     this.agility   = Math.round(base * difficultyMultiplier);
     this.intellect = Math.round(base * difficultyMultiplier);
     this.spirit    = Math.round(base * difficultyMultiplier);
-    this.stamina   = Math.round(base * 3 * difficultyMultiplier); // affects HP
+    this.stamina   = Math.round(base * 10 * difficultyMultiplier); // affects HP
 
     this.name = this.generateName();
     this.image = `monster_` + (this.getRandomInt(this.MAX_MONSTER_IMAGES) + 1);
