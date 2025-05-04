@@ -207,7 +207,7 @@ export class Player extends Entity {
 }
 
 export class Monster extends Entity {
-  name = "Monster";
+  name = "Dread Beast";
   rarity: "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Boss";
   MAX_MONSTER_IMAGES = 6;
   image: string = `monster_` + (this.getRandomInt(this.MAX_MONSTER_IMAGES) + 1);
@@ -223,7 +223,7 @@ export class Monster extends Entity {
   ];
 
   private static species = [
-    "Warg", "Spider", "Lich", "Bandit", "Wolf", "Golem", "Beast", "Wraith", "Bat", "Cultist", "Serpent", "Ghoul"
+    "Warg", "Demon", "Lich", "Bandit", "Wolf", "Golem", "Hellspawn", "Wraith", "Bat", "Cultist", "Serpent", "Ghoul"
   ];
 
   get totalArmor(): number {
@@ -338,4 +338,3 @@ export const MONSTER_AFFIX_BONUSES: Record<string, MonsterBonus> = {
   "of Stone":        { stat: "Armor", flat: 3, percent: 0.01 },
   "of Fortitude":    { stat: "Armor", flat: 6, percent: 0.02 }
 };
-
